@@ -1,0 +1,96 @@
+body {
+  margin: 0;
+  padding: .1px;
+  box-sizing: border-box;
+  /* width: 5000px; */
+}
+.button-open-portal {
+  border: none;
+  background-color: lightskyblue;
+  color: black;
+  width: 100px;
+  /* height: 40px; */
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  margin: 50px auto;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portal-2 .button-open-portal{
+  /* margin-left: auto; */
+}
+
+.portal {
+  position: relative;
+}
+.custom-button {
+  width: 100px;
+  height: 40px;
+  background-color: tomato;
+  border-radius: 5px;
+}
+
+.portal-box {
+  width: 200px;
+  /* min-height: 100px; */
+  position: absolute;
+  padding: 10px;
+  background-color: black;
+  color: white;
+  top: 0;
+  /* display: none; */
+  left: 0;
+  z-index: 2;
+  /* display: flex; */
+  align-items: center;
+  justify-content: center;
+  /* border-radius: 5px; */
+  /* border-top-left-radius: 0; */
+  transition: .3s opacity;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.portal-triangle-top {
+  content: '';
+  width: 0;
+  position: absolute;
+  left:0;
+  top: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid black;
+}
+.portal-triangle-left {
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right:10px solid black;
+  position: absolute;
+}
+.portal-box.open {
+  visibility: visible;
+  display: block;
+  opacity: 1;
+}
+.portal-1, .portal-2, .portal-3, .portal-4, .portal-5 {
+  padding: .1px;
+}
+.portal-1 {
+  background: lime;
+}
+.portal-2 {
+  background: thistle;
+}
+.portal-3 {
+  background: teal;
+}
+.portal-1 {
+  background: firebrick;
+}
