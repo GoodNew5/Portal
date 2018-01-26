@@ -13,7 +13,7 @@ body {
   font-size: 15px;
   text-align: center;
   cursor: pointer;
-  margin: 50px auto;
+  margin: 50px 100px;
   padding: 10px;
   display: flex;
   align-items: center;
@@ -21,7 +21,7 @@ body {
 }
 
 .portal-2 .button-open-portal{
-  /* margin-left: auto; */
+  margin-left: 400px;
 }
 
 .portal {
