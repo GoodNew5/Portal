@@ -1,4 +1,4 @@
-
+'use strict'
 
 var Portal = {
   render: function (options) {
@@ -9,7 +9,6 @@ var Portal = {
       position: options.position || 'bottom'
     }
 
-    var coordinates = {};
     var target = document.querySelector(options.target);
 
     if (target === null) {
@@ -57,6 +56,7 @@ var Portal = {
     function calcPosition(target) {
       var scrollTop = window.pageYOffset;
       var scrollWidth = window.pageXOffset;
+      var coordinates = {};
       portalBox.width = portalBox.el.offsetWidth
 
       if (options.position === 'bottom') {
@@ -88,22 +88,29 @@ var Portal = {
       return coordinates
     }
 
-    function setPosition() {
+    function setPosition(coordinates) {
       portalBox.el.style.left = coordinates.x + 'px';
       portalBox.el.style.top = coordinates.y + 'px';
     }
 
     window.addEventListener('resize', function () {
       portalBox.el.classList.remove('open');
-      calcPosition(target);
-      setPosition();
+      var coordinates = calcPosition(target);
+      setPosition(coordinates);
     });
 
     target.addEventListener('click', function () {
-      calcPosition(target);
-      setPosition();
+      var coordinates = calcPosition(target);
+      setPosition(coordinates);
       portalBox.el.classList.toggle('open');
     });
+
+    window.addEventListener('click', function (event) {
+      if (event.target != target && !target.contains(event.target)
+        && event.target != portalBox.el && !portalBox.el.contains(event.target)) {
+        portalBox.el.classList.remove('open');
+      }
+    })
 
 
 
@@ -137,6 +144,14 @@ Portal.render({
   position: 'bottom',
   triangle: true
 });
+
+document.querySelector('.test').onclick = function () {
+  var i = 0;
+  setInterval(function () {
+    console.log(i++);
+  }, 1000);
+  this.parentNode.removeChild(this);
+}
 
 //
 
