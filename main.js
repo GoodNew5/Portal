@@ -99,24 +99,41 @@ var Portal = {
       setPosition(coordinates);
     });
 
-    target.addEventListener('click', function () {
+    target.addEventListener('click', openPortal)
+
+    function openPortal() {
       var coordinates = calcPosition(target);
       setPosition(coordinates);
       portalBox.el.classList.toggle('open');
-    });
+      var i = 0;
+      setInterval(function () {
+        console.log(i++);
+      }, 1000);
+
+    }
+
+
+
 
     window.addEventListener('click', function (event) {
-      if (event.target != target && !target.contains(event.target)
-        && event.target != portalBox.el && !portalBox.el.contains(event.target)) {
+      if (
+        event.target != target
+        && !target.contains(event.target)
+        && event.target != portalBox.el
+        && !portalBox.el.contains(event.target)
+      )
+      {
         portalBox.el.classList.remove('open');
       }
     })
 
-
-
   }
 
-
+}
+// for test
+function remove(node) {
+  var el = document.querySelector(node);
+  document.body.removeChild(el);
 }
 
 Portal.render({
