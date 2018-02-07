@@ -57,9 +57,10 @@ var Portal = {
       var scrollTop = window.pageYOffset;
       var scrollWidth = window.pageXOffset;
       var coordinates = {};
+
       portalBox.width = portalBox.el.offsetWidth
 
-      if (options.position === 'bottom') {
+      function positionedBottom() {
         var top = target.getBoundingClientRect().top + target.offsetHeight + scrollTop;
 
         coordinates.x = (target.getBoundingClientRect().left - (portalBox.width - target.offsetWidth) / 2) + scrollWidth
@@ -68,23 +69,46 @@ var Portal = {
         if (options.triangle) {
           coordinates.y = top + trian.el.offsetHeight;
         }
+      }
 
+      function positionedRight() {
+        coordinates.x = target.getBoundingClientRect().left + target.offsetWidth + scrollWidth
+        coordinates.y = target.getBoundingClientRect().top + scrollTop
+
+        if (options.triangle) {
+          coordinates.x = target.getBoundingClientRect().left + target.offsetWidth + triangle.offsetWidth
+        }
+      }
+
+      function positionedLeft() {
+        coordinates.x = + target.getBoundingClientRect().left - portalBox.width + scrollWidth
+        coordinates.y = target.getBoundingClientRect().top + scrollTop
+      }
+
+      function positionedTop() {
+        var top = target.getBoundingClientRect().top + scrollTop - portalBox.el.offsetHeight;
+        coordinates.y = top;
+        coordinates.x = (target.getBoundingClientRect().left - (portalBox.width - target.offsetWidth) / 2) + scrollWidth
+      }
+
+      if (options.position === 'bottom') {
+        positionedBottom()
       }
 
       if (options.position === 'right') {
-        coordinates.x = target.getBoundingClientRect().x + target.offsetWidth + scrollWidth
-        coordinates.y = target.getBoundingClientRect().y + scrollTop
-
-        if (options.triangle) {
-          coordinates.x = target.getBoundingClientRect().x + target.offsetWidth + triangle.offsetWidth
-        }
+        positionedRight()
 
       }
 
       if (options.position === 'left') {
-        coordinates.x = + target.getBoundingClientRect().x - portalBox.width + scrollWidth
-        coordinates.y = target.getBoundingClientRect().y + scrollTop
+        positionedLeft()
       }
+
+      if (options.position === 'top') {
+        positionedTop()
+      }
+
+
       return coordinates
     }
 
@@ -121,8 +145,7 @@ var Portal = {
         && !target.contains(event.target)
         && event.target != portalBox.el
         && !portalBox.el.contains(event.target)
-      )
-      {
+      ) {
         portalBox.el.classList.remove('open');
       }
     })
@@ -161,6 +184,12 @@ Portal.render({
   position: 'bottom',
   triangle: true
 });
+
+Portal.render({
+  target: '.button-6',
+  position: 'top'
+});
+
 
 document.querySelector('.test').onclick = function () {
   var i = 0;
