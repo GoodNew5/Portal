@@ -107,6 +107,7 @@ body, html {
 .portal-1 {
   background: lime;
   display: flex;
+  align-items: flex-start;
 }
 
 body {
