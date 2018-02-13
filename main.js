@@ -1,9 +1,8 @@
 'use strict'
-// console.log();
+
 
 var Portal = {
   render: function (options) {
-
     var options = {
       target: options.target,
       triangle: options.triangle || false,
@@ -13,14 +12,16 @@ var Portal = {
     var target = document.querySelector(options.target);
     const root = document.getElementsByTagName('html')[0];
     const rootTop = root.clientTop;
+    const rootWidth = root.clientWidth;
     const rootLeft = root.clientLeft;
     const rootRight = root.clientRight;
+    var sizes;
 
     // todo написать функцию для получения размеров: кнопки, треугольника, порталбокса
     // которая должна возвращать объект с размерами каждой из фигур и потом передать этот объект в функцию calcPosition
     // записать все размеры в соответствующие переменные внутри этой функции и использовать для правильного позиционирования относительно кнопки
 
-
+    // if(target.height > portalBox.height) => {triangle center portalBox}
 
 
 
@@ -43,9 +44,6 @@ var Portal = {
 
 
 
-
-
-
     function renderTriangle() {
 
       const triangle = document.createElement('div');
@@ -58,84 +56,123 @@ var Portal = {
         triangle.classList.add('portal-triangle-left');
       }
 
+      if (options.position === 'left') {
+        triangle.classList.add('portal-triangle-right');
+      }
+
       return triangle
     }
 
     if (options.triangle) {
-
       var triangle = portalBox.appendChild(renderTriangle());
-      console.log(triangle)
     }
-    // console.log(triangle)
 
 
-    function calcPosition(target, portalBox, triangle) {
+    function getSize(portalBox, target, triangle) {
+      var sizes = {
+        box: {
+          width: portalBox.offsetWidth,
+          height: portalBox.offsetHeight
+        },
+        target: {
+          width: target.offsetWidth,
+          height: target.offsetHeight
+        },
+        triangle: {
+          width: 0,
+          height: 0
+        }
+      }
+
+       if (options.triangle) {
+         sizes.triangle.height = triangle.offsetHeight
+         sizes.triangle.width = triangle.offsetWidth
+       }
+
+      return sizes
+    }
+
+
+    function ready() {
+      sizes = getSize(portalBox, target, triangle);
+    }
+
+
+
+
+    function calcPosition(target, sizes) {
       const scrollTop = window.pageYOffset;
       const scrollWidth = window.pageXOffset;
       const coordinates = {};
       const targetTop = target.getBoundingClientRect().top;
       const targetLeft = target.getBoundingClientRect().left;
-      const targetHeight = target.offsetHeight;
-      const targetWidth = target.offsetWidth;
-      const portalBoxWidth = portalBox.offsetWidth;
-      const portalBoxHeight = portalBox.offsetHeight;
-      const triangleHeight = triangle ? triangle.offsetHeight : 0;
-      const triangleWidth = triangle ? triangle.offsetWidth : 0;
-
-
-      // console.log(triangle.el.offsetHeight)
-      // var triangleLeft = triangle.getBoundingClientRect().left;
 
 
 
+      if (options.triangle) {
+        var centerTriangle = (sizes.target.height / 2) - (sizes.triangle.height / 2)
+        coordinates.tr = {}
+      }
 
       function positionedBottom() {
-        // triangle ? true : triangleHeight = triangle.offsetHeight
+        coordinates.x = (targetLeft - (sizes.box.width - sizes.target.width) / 2) + scrollWidth
+        coordinates.y = targetTop + sizes.target.height + scrollTop + sizes.triangle.height;
+        console.log(sizes.target.height)
+        console.log(sizes.triangle.heigh)
+        // console.log(coordinates.y)
+
+        if (options.triangle) {
+          coordinates.tr.y = -sizes.triangle.height
+        }
 
 
-        coordinates.x = (targetLeft - (portalBoxWidth - targetWidth) / 2) + scrollWidth
-        coordinates.y = targetTop + targetHeight + scrollTop + triangleHeight;
+
+
 
 
         return coordinates
       }
 
       function positionedRight() {
+        coordinates.x = targetLeft + sizes.target.width + scrollWidth + sizes.triangle.width
+        coordinates.y = targetTop + scrollTop
+        console.log(sizes.target.height)
 
-
-        if (!(coordinates.x < rootRight)) {
-          coordinates.x = targetLeft + targetWidth + scrollWidth + triangleWidth
-          coordinates.y = targetTop + scrollTop
-
-          if (triangle) {
-            coordinates.tr = {}
-            coordinates.tr.y = (targetHeight / 2) - (triangleHeight / 2)
-          }
+        if (options.triangle) {
+          coordinates.tr.y = centerTriangle
+          coordinates.tr.x = -sizes.triangle.width
         }
 
-        else {
+        if (coordinates.x > rootWidth) {
+
           positionedLeft()
         }
+
+
+
 
         return coordinates
       }
 
       function positionedLeft() {
+        coordinates.x = + targetLeft - sizes.box.width - sizes.triangle.width + scrollWidth
+        coordinates.y = targetTop + scrollTop
 
-        if (!( coordinates.x < rootLeft )) {
-          coordinates.x = + targetLeft - portalBoxWidth + scrollWidth
-          coordinates.y = targetTop + scrollTop
+        if (options.triangle) {
+          coordinates.tr.y = centerTriangle;
+          coordinates.tr.x = sizes.box.width
         }
-        else {
-          positionedRight()
+
+        if (coordinates.x < rootLeft) {
+          positionedRight();
         }
 
         return coordinates
       }
 
       function positionedTop() {
-        coordinates.y = targetTop + scrollTop - portalBoxHeight;
-        coordinates.x = (targetLeft - (portalBoxWidth - targetWidth) / 2) + scrollWidth
+        coordinates.y = targetTop + scrollTop - sizes.box.height;
+        coordinates.x = (targetLeft - (sizes.box.width - sizes.target.width) / 2) + scrollWidth
 
         if ( coordinates.y < rootTop ) {
           positionedBottom();
@@ -146,12 +183,11 @@ var Portal = {
 
 
       if ( options.position === 'bottom' ) {
-        positionedBottom();
+        positionedBottom()
       }
 
       if ( options.position === 'right' ) {
         positionedRight()
-
       }
 
       if ( options.position === 'left' ) {
@@ -159,7 +195,7 @@ var Portal = {
       }
 
       if ( options.position === 'top' ) {
-        positionedTop();
+        positionedTop()
       }
 
 
@@ -172,19 +208,22 @@ var Portal = {
 
       if(options.triangle) {
         triangle.style.top = coordinates.tr.y + 'px';
+        triangle.style.left = coordinates.tr.x + 'px';
       }
+
     }
+    document.addEventListener("DOMContentLoaded", ready)
 
     window.addEventListener('resize', function () {
       portalBox.classList.remove('open');
-      var coordinates = calcPosition(target, portalBox, triangle);
+      var coordinates = calcPosition(target, sizes);
       setPosition(coordinates, portalBox, triangle);
     });
 
     target.addEventListener('click', openPortal)
 
     function openPortal() {
-      var coordinates = calcPosition(target, portalBox, triangle);
+      var coordinates = calcPosition(target, sizes);
       setPosition(coordinates, portalBox, triangle);
       portalBox.classList.toggle('open');
 
@@ -214,7 +253,7 @@ function remove(node) {
 }
 
 Portal.render({
-  triangle: true,
+  triangle: false,
   target: '#custom-button',
   position: 'bottom'
 });
