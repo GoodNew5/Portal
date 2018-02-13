@@ -21,6 +21,9 @@ var Portal = {
     // записать все размеры в соответствующие переменные внутри этой функции и использовать для правильного позиционирования относительно кнопки
 
 
+
+
+
     if (target === null) {
       console.error('Target is not detected, check option "target" or your HTML')
       return
@@ -41,24 +44,27 @@ var Portal = {
 
 
 
-    function renderTriangle(portalBox) {
+
+
+    function renderTriangle() {
 
       const triangle = document.createElement('div');
-      const el = portalBox.appendChild(triangle);
 
       if (options.position === 'bottom') {
-        el.classList.add('portal-triangle-top')
+        triangle.classList.add('portal-triangle-top')
       }
 
       if (options.position === 'right') {
-        el.classList.add('portal-triangle-left');
+        triangle.classList.add('portal-triangle-left');
       }
 
-      return el
+      return triangle
     }
 
     if (options.triangle) {
-      var triangle = renderTriangle(portalBox);
+
+      var triangle = portalBox.appendChild(renderTriangle());
+      console.log(triangle)
     }
     // console.log(triangle)
 
