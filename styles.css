@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: .1px;
   box-sizing: border-box;
-  /* width: 5000px; */
+  width: 5000px;
 }
 .button-open-portal {
   border: none;
@@ -21,7 +21,8 @@ body {
 }
 
 .portal-2 .button-open-portal{
-  margin-left: 400px;
+  margin-left: 900px;
+  margin-top: 1000px;
 }
 
 .portal {
@@ -60,11 +61,14 @@ body {
   width: 0;
   position: absolute;
   left:0;
-  top: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
   height: 0;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-bottom: 10px solid black;
+  bottom: 100%;
 }
 .portal-triangle-left {
   width: 0;
@@ -73,6 +77,17 @@ body {
   border-bottom: 10px solid transparent;
   border-right:10px solid black;
   position: absolute;
+  right: 100%;
+}
+
+.portal-triangle-right {
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right:10px solid black;
+  position: absolute;
+  right: 100%;
 }
 .portal-box.open {
   visibility: visible;
@@ -84,6 +99,10 @@ body {
 }
 .portal-1 {
   background: lime;
+  display: flex;
+}
+body {
+  /* border: 210px black solid; */
 }
 .portal-2 {
   background: thistle;

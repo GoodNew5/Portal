@@ -1,15 +1,25 @@
 'use strict'
+// console.log();
 
 var Portal = {
   render: function (options) {
 
     var options = {
       target: options.target,
-      triangle: options.triangle,
+      triangle: options.triangle || false,
       position: options.position || 'bottom'
     }
 
     var target = document.querySelector(options.target);
+    const root = document.getElementsByTagName('html')[0];
+    const rootTop = root.clientTop;
+    const rootLeft = root.clientLeft;
+    const rootRight = root.clientRight;
+
+    // todo написать функцию для получения размеров: кнопки, треугольника, порталбокса
+    // которая должна возвращать объект с размерами каждой из фигур и потом передать этот объект в функцию calcPosition
+    // записать все размеры в соответствующие переменные внутри этой функции и использовать для правильного позиционирования относительно кнопки
+
 
     if (target === null) {
       console.error('Target is not detected, check option "target" or your HTML')
@@ -19,120 +29,158 @@ var Portal = {
     var content = target.dataset.portal;
     target.className = "button-open-portal";
 
-    var portalBox = {
-      el: document.querySelector(content),
-      width: null
-    }
+    var portalBox = document.querySelector(content)
 
-    if (portalBox.el === null) {
+    if (portalBox === null) {
       console.error('Check in your html data atribute "data-portal", content not found')
       return
     }
 
-    portalBox.el.className = "portal-box";
+    portalBox.className = "portal-box";
 
-    if (options.triangle) {
 
-      var trian = {
-        el: document.createElement('div'),
-        height: null,
-        width: null,
-        directions: null
-      }
 
-      portalBox.el.appendChild(trian.el);
-    }
 
-    if (options.triangle && options.position === 'bottom') {
+    function renderTriangle(portalBox) {
 
-      trian.directions = trian.el.classList.add('portal-triangle-top');
-      trian.height = trian.el.offsetHeight;
-      trian.width = trian.el.offsetWidth;
-      trian.el.style.top = '-' + trian.height + 'px';
-      trian.el.style.left = (portalBox.el.offsetWidth - trian.width) / 2 + 'px';
-
-    }
-
-    function calcPosition(target) {
-      var scrollTop = window.pageYOffset;
-      var scrollWidth = window.pageXOffset;
-      var coordinates = {};
-
-      portalBox.width = portalBox.el.offsetWidth
-
-      function positionedBottom() {
-        var top = target.getBoundingClientRect().top + target.offsetHeight + scrollTop;
-
-        coordinates.x = (target.getBoundingClientRect().left - (portalBox.width - target.offsetWidth) / 2) + scrollWidth
-        coordinates.y = top;
-
-        if (options.triangle) {
-          coordinates.y = top + trian.el.offsetHeight;
-        }
-      }
-
-      function positionedRight() {
-        coordinates.x = target.getBoundingClientRect().left + target.offsetWidth + scrollWidth
-        coordinates.y = target.getBoundingClientRect().top + scrollTop
-
-        if (options.triangle) {
-          coordinates.x = target.getBoundingClientRect().left + target.offsetWidth + triangle.offsetWidth
-        }
-      }
-
-      function positionedLeft() {
-        coordinates.x = + target.getBoundingClientRect().left - portalBox.width + scrollWidth
-        coordinates.y = target.getBoundingClientRect().top + scrollTop
-      }
-
-      function positionedTop() {
-        var top = target.getBoundingClientRect().top + scrollTop - portalBox.el.offsetHeight;
-        coordinates.y = top;
-        coordinates.x = (target.getBoundingClientRect().left - (portalBox.width - target.offsetWidth) / 2) + scrollWidth
-      }
+      const triangle = document.createElement('div');
+      const el = portalBox.appendChild(triangle);
 
       if (options.position === 'bottom') {
-        positionedBottom()
+        el.classList.add('portal-triangle-top')
       }
 
       if (options.position === 'right') {
+        el.classList.add('portal-triangle-left');
+      }
+
+      return el
+    }
+
+    if (options.triangle) {
+      var triangle = renderTriangle(portalBox);
+    }
+    // console.log(triangle)
+
+
+    function calcPosition(target, portalBox, triangle) {
+      const scrollTop = window.pageYOffset;
+      const scrollWidth = window.pageXOffset;
+      const coordinates = {};
+      const targetTop = target.getBoundingClientRect().top;
+      const targetLeft = target.getBoundingClientRect().left;
+      const targetHeight = target.offsetHeight;
+      const targetWidth = target.offsetWidth;
+      const portalBoxWidth = portalBox.offsetWidth;
+      const portalBoxHeight = portalBox.offsetHeight;
+      const triangleHeight = triangle ? triangle.offsetHeight : 0;
+      const triangleWidth = triangle ? triangle.offsetWidth : 0;
+
+
+      // console.log(triangle.el.offsetHeight)
+      // var triangleLeft = triangle.getBoundingClientRect().left;
+
+
+
+
+      function positionedBottom() {
+        // triangle ? true : triangleHeight = triangle.offsetHeight
+
+
+        coordinates.x = (targetLeft - (portalBoxWidth - targetWidth) / 2) + scrollWidth
+        coordinates.y = targetTop + targetHeight + scrollTop + triangleHeight;
+
+
+        return coordinates
+      }
+
+      function positionedRight() {
+
+
+        if (!(coordinates.x < rootRight)) {
+          coordinates.x = targetLeft + targetWidth + scrollWidth + triangleWidth
+          coordinates.y = targetTop + scrollTop
+
+          if (triangle) {
+            coordinates.tr = {}
+            coordinates.tr.y = (targetHeight / 2) - (triangleHeight / 2)
+          }
+        }
+
+        else {
+          positionedLeft()
+        }
+
+        return coordinates
+      }
+
+      function positionedLeft() {
+
+        if (!( coordinates.x < rootLeft )) {
+          coordinates.x = + targetLeft - portalBoxWidth + scrollWidth
+          coordinates.y = targetTop + scrollTop
+        }
+        else {
+          positionedRight()
+        }
+
+        return coordinates
+      }
+
+      function positionedTop() {
+        coordinates.y = targetTop + scrollTop - portalBoxHeight;
+        coordinates.x = (targetLeft - (portalBoxWidth - targetWidth) / 2) + scrollWidth
+
+        if ( coordinates.y < rootTop ) {
+          positionedBottom();
+        }
+
+        return coordinates
+      }
+
+
+      if ( options.position === 'bottom' ) {
+        positionedBottom();
+      }
+
+      if ( options.position === 'right' ) {
         positionedRight()
 
       }
 
-      if (options.position === 'left') {
+      if ( options.position === 'left' ) {
         positionedLeft()
       }
 
-      if (options.position === 'top') {
-        positionedTop()
+      if ( options.position === 'top' ) {
+        positionedTop();
       }
 
 
       return coordinates
     }
 
-    function setPosition(coordinates) {
-      portalBox.el.style.left = coordinates.x + 'px';
-      portalBox.el.style.top = coordinates.y + 'px';
+    function setPosition(coordinates, portalBox, triangle) {
+      portalBox.style.left = coordinates.x + 'px';
+      portalBox.style.top = coordinates.y + 'px';
+
+      if(options.triangle) {
+        triangle.style.top = coordinates.tr.y + 'px';
+      }
     }
 
     window.addEventListener('resize', function () {
-      portalBox.el.classList.remove('open');
-      var coordinates = calcPosition(target);
-      setPosition(coordinates);
+      portalBox.classList.remove('open');
+      var coordinates = calcPosition(target, portalBox, triangle);
+      setPosition(coordinates, portalBox, triangle);
     });
 
     target.addEventListener('click', openPortal)
 
     function openPortal() {
-      var coordinates = calcPosition(target);
-      setPosition(coordinates);
-      portalBox.el.classList.toggle('open');
-      var i = 0;
-      setInterval(function () {
-        console.log(i++);
-      }, 1000);
+      var coordinates = calcPosition(target, portalBox, triangle);
+      setPosition(coordinates, portalBox, triangle);
+      portalBox.classList.toggle('open');
 
     }
 
@@ -143,10 +191,10 @@ var Portal = {
       if (
         event.target != target
         && !target.contains(event.target)
-        && event.target != portalBox.el
-        && !portalBox.el.contains(event.target)
+        && event.target != portalBox
+        && !portalBox.contains(event.target)
       ) {
-        portalBox.el.classList.remove('open');
+        portalBox.classList.remove('open');
       }
     })
 
@@ -160,23 +208,27 @@ function remove(node) {
 }
 
 Portal.render({
+  triangle: true,
   target: '#custom-button',
   position: 'bottom'
 });
 
 Portal.render({
   target: '.button-2',
-  position: 'right'
+  position: 'right',
+  triangle: true
 });
 
 Portal.render({
   target: '.button-3',
-  position: 'left'
+  position: 'left',
+  triangle: true
 });
 
 Portal.render({
   target: '.button-4',
-  position: 'bottom'
+  position: 'bottom',
+  triangle: false
 });
 
 Portal.render({
@@ -185,19 +237,26 @@ Portal.render({
   triangle: true
 });
 
+// Portal.render({
+//   target: '.button-6',
+//   position: 'top'
+// });
+
 Portal.render({
-  target: '.button-6',
+  target: '.button-10',
   position: 'top'
 });
 
-
-document.querySelector('.test').onclick = function () {
-  var i = 0;
-  setInterval(function () {
-    console.log(i++);
-  }, 1000);
-  this.parentNode.removeChild(this);
-}
+// if (options.triangle) {
+//   coordinates.x = target.getBoundingClientRect().left + target.offsetWidth + triangle.offsetWidth
+// }
+// document.querySelector('.test').onclick = function () {
+//   var i = 0;
+//   setInterval(function () {
+//     console.log(i++);
+//   }, 1000);
+//   this.parentNode.removeChild(this);
+// }
 
 //
 
