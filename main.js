@@ -4,31 +4,33 @@
 
   this.Portal = function(options) {
 
-    var options = { target: options.target, triangle: options.triangle || false, position: options.position || "bottom" };
+    options = {
+      target: options.target,
+      triangle: options.triangle || false,
+      position: options.position || "bottom"
+    };
 
-    var target = document.querySelector(options.target);
+    const target = document.querySelector(options.target);
     const root = document.getElementsByTagName("html")[0];
     const rootTop = root.clientTop;
     const rootWidth = root.clientWidth;
     const rootLeft = root.clientLeft;
     const rootRight = root.clientRight;
-    var sizes;
-    var content;
 
-    // todo написать функцию для получения размеров: кнопки, треугольника, порталбокса
-    // которая должна возвращать объект с размерами каждой из фигур и потом передать этот объект в функцию calcPosition
-    // записать все размеры в соответствующие переменные внутри этой функции и использовать для правильного позиционирования относительно кнопки
+    let sizes;
+    let content;
+    let triangle;
 
-    // todo if(target.height > portalBox.height) => {triangle center portalBox}
 
     if (target === null) {
       console.error('Target is not detected, check option "target" or your HTML');
       return;
     }
+
     target.className = "button-open-portal";
 
     content = target.dataset.portal;
-    var portalBox = document.querySelector(content);
+    const portalBox = document.querySelector(content);
 
     if (portalBox === null) {
       console.error('Check in your html data atribute "data-portal", content not found');
@@ -39,27 +41,31 @@
 
     if (options.triangle) {
       function renderTriangle() {
-        const triangle = document.createElement("div");
+        let el = document.createElement("div");
 
         if (options.position === "bottom") {
-          triangle.classList.add("portal-triangle-top");
+          el.classList.add("portal-triangle-top");
         }
 
         if (options.position === "right") {
-          triangle.classList.add("portal-triangle-left");
+          el.classList.add("portal-triangle-left");
         }
 
         if (options.position === "left") {
-          triangle.classList.add("portal-triangle-right");
+          el.classList.add("portal-triangle-right");
         }
 
-        return triangle;
+        return el;
       }
-      var triangle = portalBox.appendChild(renderTriangle());
+
+      triangle = portalBox.appendChild(renderTriangle());
+
     }
 
+
+
     function getSize(portalBox, target, triangle) {
-      var sizes = {
+      const sizes = {
         box: {
           width: portalBox.offsetWidth,
           height: portalBox.offsetHeight
@@ -94,9 +100,15 @@
       const targetLeft = target.getBoundingClientRect().left;
       const heightCase = sizes.target.height > sizes.box.height;
 
-      function alignedTriangleY(element) {
-        return element.height / 2 - sizes.triangle.height / 2;
+      if (options.triangle) {
+        coordinates.tr = {};
+
+        function alignedTriangleY(element) {
+          return element.height / 2 - sizes.triangle.height / 2;
+        }
       }
+
+
 
       function alignedYCase1() {
         // aligned case1
@@ -104,18 +116,17 @@
         if (heightCase) {
           coordinates.tr.y = alignedTriangleY(sizes.box);
         }
+        return coordinates
       }
 
-      if (options.triangle) {
-        coordinates.tr = {};
-      }
+
 
       function positionedBottom() {
         coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2 + scrollWidth;
         coordinates.y = targetTop + sizes.target.height + scrollTop + sizes.triangle.height;
 
         if (options.triangle) {
-          coordinates.tr.y = -sizes.triangle.height;
+          coordinates.tr.y = - sizes.triangle.height;
         }
 
         return coordinates;
@@ -127,7 +138,7 @@
 
         if (options.triangle) {
           coordinates.tr.y = alignedTriangleY(sizes.target);
-          coordinates.tr.x = -sizes.triangle.width;
+          coordinates.tr.x = - sizes.triangle.width;
 
           alignedYCase1();
         }
@@ -146,6 +157,7 @@
         if (options.triangle) {
           coordinates.tr.y = alignedTriangleY(sizes.target);
           coordinates.tr.x = sizes.box.width;
+
           alignedYCase1();
         }
 
@@ -201,7 +213,7 @@
     target.addEventListener("click", handler);
 
     function draw() {
-      var coordinates = calcPosition(target, sizes);
+      let coordinates = calcPosition(target, sizes);
       setPosition(coordinates, portalBox, triangle);
     }
 
@@ -238,7 +250,7 @@ Portal({
 
 Portal({
   target: '.button-2',
-  position: 'right',
+  position: 'left',
   triangle: true
 });
 
@@ -267,7 +279,8 @@ Portal({
 
 Portal({
   target: '.button-10',
-  position: 'right'
+  position: 'right',
+  triangle: true
 });
 
 // if (options.triangle) {
