@@ -1,8 +1,14 @@
 body {
   margin: 0;
-  padding: .1px;
-  box-sizing: border-box;
+  padding: 0;
+
   /* width: 5000px; */
+}
+img {
+  max-width: 100%;
+}
+* {
+  box-sizing: border-box;
 }
 body, html {
   /* height: 100%; */
@@ -22,15 +28,21 @@ body, html {
   align-items: center;
   justify-content: center;
 }
-
+.portal-1 .button-open-portal {
+  margin-left: 445px;
+}
 .portal-2 .button-open-portal{
-  margin-left: 500px;
+  margin-left: 700px;
   /* margin-top: 1000px; */
 }
 .portal-3 .button-open-portal {
-  margin-left: 300px;
+  margin-left: 688px;
 }
-
+.test {
+  width: 0;
+  height: 0;
+  border: 10px black solid;
+}
 .portal {
   position: relative;
 }
@@ -42,24 +54,31 @@ body, html {
 }
 
 .portal-box {
-  width: 200px;
+  /* max-width: 300px; */
   /* min-height: 100px; */
+  width: 500px;
   position: absolute;
   padding: 10px;
   background-color: black;
+  display: block;
   color: white;
   top: 0;
   /* display: none; */
   left: 0;
   z-index: 2;
   /* display: flex; */
-  align-items: center;
-  justify-content: center;
+  /* align-items: center; */
+  /* justify-content: center; */
   /* border-radius: 5px; */
   /* border-top-left-radius: 0; */
-  transition: .3s opacity;
+  /* transition: .3s opacity; */
   visibility: hidden;
-  opacity: 0;
+  /* opacity: 0; */
+}
+@media (min-width: 1200px) {
+  .portal-box {
+    width: 600px;
+  }
 }
 
 .portal-triangle-top {
@@ -74,6 +93,18 @@ body, html {
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-bottom: 10px solid black;
+  bottom: 100%;
+}
+.portal-triangle-bottom {
+  content: '';
+  width: 0;
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid black;
   bottom: 100%;
 }
 .portal-triangle-left {
@@ -106,7 +137,8 @@ body, html {
 }
 .portal-1 {
   background: lime;
-  display: flex;
+  /* display: flex; */
+  flex-wrap: wrap;
   align-items: flex-start;
 }
 
