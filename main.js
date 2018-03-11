@@ -16,7 +16,6 @@
 
     const target = document.querySelector(options.target);
     const root = document.getElementsByTagName("html")[0];
-    const rootHeight = document.getElementsByTagName("html")[0].offsetHeight;
     const rootTop = root.clientTop;
     const rootWidth = root.clientWidth;
     const rootLeft = root.clientLeft;
@@ -76,11 +75,7 @@
     target.className = "button-open-portal";
 
     let getContent = function(target) {
-
-
-
       let content = target.dataset.portal; // custom content
-
       return content
 
     }
@@ -99,13 +94,8 @@
 
     if (options.triangle) {
 
-      let el = document.createElement("div"); // problem with triangle
+      let el = document.createElement("div");
       triangle = portalBox.appendChild(el);
-
-
-      function triangleSetDirection(direction, triangle) {
-        triangle.style = direction
-      }
 
     }
 
@@ -115,6 +105,9 @@
 
 
       let sizes = {
+        root: {
+          height: document.getElementsByTagName("html")[0].offsetHeight
+        },
         box: {
           width: portalBox.offsetWidth,
           height: portalBox.offsetHeight
@@ -154,191 +147,127 @@
           if (heightCase) {
             coordinates.tr.y = alignedTriangleY(sizes.box);
           }
-          return coordinates
         }
 
       }
-      function getFreeSpace(params) {
-
-      }
 
 
-      function getTriangleRightPosition() {
-        coordinates.tr.x = - sizes.triangle.width;
-        coordinates.tr.y = alignedTriangleY(sizes.target);
-        alignedYCase1();
-
-        return coordinates
-      }
-
-      function getTriangleLeftPosition() {
-        coordinates.tr.x = sizes.box.width;
-        coordinates.tr.y = alignedTriangleY(sizes.target);
-        alignedYCase1();
-
-        return coordinates
-      }
-
-      function getTriangleBottomPosition() {
-        coordinates.tr.y = - sizes.triangle.height
-        return coordinates
-      }
-
-      function getTriangleTopPosition() {
-        coordinates.tr.y = sizes.box.height;
-        return coordinates
-      }
-
-      function setLeftPosition (place) {
-        if (options.triangle) {
-          getTriangleLeftPosition();
-          triangleSetDirection(triangleRightDirection, triangle);
-        }
-
-        getPositionBoxLeft();
-      }
-
-      function setRightPosition () {
-
-        if (options.triangle) {
-          getTriangleRightPosition();
-          triangleSetDirection(triangleLeftDirection, triangle);
-        }
-        getPositionBoxRight();
-      }
-
-      function setBottomPosition() {
-        if (options.triangle) {
-          getTriangleBottomPosition();
-          triangleSetDirection(triangleBottomDirection, triangle);
-        }
-        getPositionBoxBottom();
-      }
-
-      function setTopPosition() {
-
-        if (options.triangle) {
-          getTriangleTopPosition();
-          triangleSetDirection(triangleTopDirection, triangle);
-        }
-        getPositionBoxTop();
-
-      }
-
-      function getPositionBoxBottom() {
+      function arrangeBottom() {
         coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2 + scrollWidth;
         coordinates.y = targetTop + sizes.target.height + scrollTop + sizes.triangle.height;
 
-        if (coordinates.x < rootLeft || coordinates.y > rootHeight) {
-          return false
+        if (options.triangle) {
+          coordinates.tr.y = - sizes.triangle.height;
+          coordinates.tr.x = 0;
+          triangle.style = triangleBottomDirection;
         }
+
+        if (coordinates.y + sizes.box.height > sizes.root.height) {
+
+          return false;
+        }
+
         return coordinates;
       }
 
-      function getPositionBoxRight() {
+      function arrangeRight() {
         coordinates.x = targetLeft + sizes.target.width + sizes.triangle.width + scrollWidth;
         coordinates.y = targetTop + scrollTop;
+        let position = "right";
+
+        if (options.triangle) {
+          coordinates.tr.x = -sizes.triangle.width;
+          coordinates.tr.y = alignedTriangleY(sizes.target);
+          alignedYCase1();
+          triangle.style = triangleLeftDirection;
+        }
 
         if (coordinates.x + sizes.box.width > rootWidth) {
           return false;
         }
 
-        return coordinates;
+        return position;
       }
 
-      function getPositionBoxLeft() {
+      function arrangeLeft() {
         coordinates.x = targetLeft - sizes.box.width - sizes.triangle.width + scrollWidth;
         coordinates.y = targetTop + scrollTop;
+        let position = "left";
+
+         if (options.triangle) {
+           coordinates.tr.x = sizes.box.width;
+           coordinates.tr.y = alignedTriangleY(sizes.target);
+           alignedYCase1();
+           triangle.style = triangleRightDirection;
+         }
 
         if (coordinates.x < rootLeft) {
           return false;
         }
 
-        return coordinates;
+        return position
       }
 
-      function getPositionBoxTop() {
+      function arrangeTop() {
         coordinates.y = targetTop + scrollTop - sizes.box.height - sizes.triangle.height;
         coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2 + scrollWidth;
 
-         if (coordinates.x < rootLeft) {
-           return false;
-         }
-        return coordinates;
+        if (options.triangle) {
+          coordinates.tr.y = sizes.box.height;
+          coordinates.tr.x = 0
+          triangle.style = triangleTopDirection;
+        }
+
+        if (coordinates.y < rootTop) {
+          return false;
+        }
+
+        return coordinates
       }
 
 
-      // todow autowidth
       function conduct() {
 
-        let positions = [getPositionBoxLeft, getPositionBoxRight, getPositionBoxBottom, getPositionBoxTop];
-
-
+        let positions = [arrangeLeft, arrangeRight, arrangeTop, arrangeBottom];
 
           if (options.position === "left") {
-            if (!positions[1]() && !positions[0]()) {
-                console.log("over left and right");
-                return /*do something*/ (coordinates.x = "auto"), (coordinates.y = "auto");
-            }
             if (!positions[0]()) {
-              return setRightPosition();
-            }
-            else {
-              return setLeftPosition();
-            }
-          }
-
-          if (options.position === "right") {
-            if (!positions[0]() && !positions[1]()) {
-              console.log("over left and right");
-              return /*do something*/ (coordinates.x = "auto"), (coordinates.y = "auto");
+              return positions[1]();
             }
             if (!positions[1]()) {
-              return setLeftPosition();
+              return positions[0]();
             }
-            else {
-              return setRightPosition();
+            return positions[0]();
+          }
+
+
+
+          if (options.position === "right") {
+            if (!positions[0]()) {
+               return positions[1]();
             }
+            if (!positions[1]()) {
+              return positions[0]();
+            }
+            return positions[1]();
 
           }
 
           if (options.position === "bottom") {
-
-            if (!positions[0]()) {
-              return setRightPosition();
-            }
-            else {
-              if (!positions[1]()) {
-                return setLeftPosition();
-              }
-              else {
-                if (!positions[2]()) {
-                  return setTopPosition();
-                }
-                else {
-                  return setBottomPosition();
-                }
-              }
+            if (!positions[3]()) {
+              return positions[2]();
+            } else {
+              return positions[3]();
             }
           }
 
 
           if (options.position === "top") {
-            if (!positions[0]()) {
-              return setRightPosition();
+            if (!positions[2]()) {
+              return positions[3]();
             }
             else {
-              if (!positions[1]()) {
-                return setLeftPosition();
-              }
-              else {
-                if (!positions[3]()) {
-                  return setBottomPosition();
-                }
-                else {
-                  return setTopPosition();
-                }
-              }
+              return positions[2]();
             }
           }
       }
@@ -352,8 +281,7 @@
 
     function setPosition(coordinates, portalBox, triangle) {
 
-      portalBox.style.left = coordinates.x + "px";
-      portalBox.style.top = coordinates.y + "px";
+      portalBox.style.transform = `translate(${coordinates.x}px, ${coordinates.y}px)`;
 
       if (options.triangle) {
         triangle.style.top = coordinates.tr.y + "px";
@@ -408,10 +336,17 @@ function remove(node) {
 // getSize(".test");
 
 Portal({
+  target: '.button-5',
+  position: 'top',
+  triangle: true
+});
+
+Portal({
   target: '.button-4',
   position: 'top',
   triangle: true
 });
+
 Portal({
   target: ".button-3",
   position: "bottom",
@@ -424,34 +359,30 @@ Portal({
   position: 'left'
 });
 
-// Portal({
-//   target: ".button-2",
-//   position: "right",
-//   triangle: true
-// });
+Portal({
+  target: ".button-2",
+  position: "right",
+  triangle: true
+});
 
 
 
-function shuffle(nodes) {
+function shuffleRandom(nodes) {
   let elements = document.querySelectorAll(nodes)
-  let max = 900;
+  let max = 1800;
   let min = 200;
   elements.forEach(element => {
     element.style = "margin-left:" + Math.random() * (max - min) + min + "px";
   });
 }
-shuffle(".button-open-portal");
+
+shuffleRandom(".button-open-portal");
 
 
 
 
 
 
-// Portal({
-//   target: '.button-5',
-//   position: 'right',
-//   triangle: true
-// });
 
 // Portal({
 //   target: '.button-6',
@@ -463,20 +394,3 @@ shuffle(".button-open-portal");
 //   position: 'left',
 //   triangle: true
 // });
-
-
-// // if (options.triangle) {
-// //   coordinates.x = target.getBoundingClientRect().left + target.offsetWidth + triangle.offsetWidth
-// // }
-// // document.querySelector('.test').onclick = function () {
-// //   var i = 0;
-// //   setInterval(function () {
-// //     console.log(i++);
-// //   }, 1000);
-// //   this.parentNode.removeChild(this);
-// // }
-
-// //
-
-
-
