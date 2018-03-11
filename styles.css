@@ -1,8 +1,13 @@
 body {
   margin: 0;
   padding: 0;
+  /* overflow: hidden; */
 
   /* width: 5000px; */
+}
+.container {
+  width: 20px;
+  height: 20px;
 }
 img {
   max-width: 100%;
@@ -22,21 +27,22 @@ body, html {
   font-size: 15px;
   text-align: center;
   cursor: pointer;
-  margin: 50px 100px;
+  margin: 50px auto;
   padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .portal-1 .button-open-portal {
-  margin-left: 445px;
+  /* margin-left: 445px; */
 }
 .portal-2 .button-open-portal{
-  margin-left: 1470.14px;
+  margin-left: 200px;
+  /* margin-left: 1470.14px; */
   /* margin-top: 1000px; */
 }
 .portal-3 .button-open-portal {
-  margin-left: 1017.88px;
+  /* margin-left: 1017.88px; */
 }
 .test {
   width: 0;
@@ -45,6 +51,7 @@ body, html {
 }
 .portal {
   position: relative;
+
 }
 .custom-button {
   width: 100px;
@@ -54,9 +61,10 @@ body, html {
 }
 
 .portal-box {
-  max-width: 150px;
+  max-width: 100px;
   /* max-width: 800px; */
   /* min-height: 100px; */
+  transition: .3s opacity, left, top;
   /* width: 150px; */
   position: absolute;
   /* width: 100%; */
@@ -75,7 +83,7 @@ body, html {
   /* border-top-left-radius: 0; */
   /* transition: .3s opacity; */
   visibility: hidden;
-  /* opacity: 0; */
+  opacity: 0;
 }
 @media (min-width: 1200px) {
   .portal-box {
@@ -91,6 +99,7 @@ body, html {
 }
 .portal-1, .portal-2, .portal-3, .portal-4, .portal-5 {
   padding: .1px;
+  /* margin: 200px; */
 }
 .portal-1 {
   background: lime;

@@ -17,27 +17,39 @@
     const target = document.querySelector(options.target);
     const root = document.getElementsByTagName("html")[0];
     const rootTop = root.clientTop;
-    const rootWidth = root.clientWidth;
     const rootLeft = root.clientLeft;
     const rootRight = root.clientRight;
+    const scrollbarWidth = getScrollBarWidth();
+
+    function getScrollBarWidth() {
+      let scrollDiv = document.createElement("div");
+      scrollDiv.style.overflowY = "scroll";
+      scrollDiv.style.width = "50px";
+      scrollDiv.style.height = "50px";
+      scrollDiv.style.visibility = "hidden";
+      document.body.appendChild(scrollDiv);
+      let scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+      document.body.removeChild(scrollDiv);
+      return scrollbarWidth
+
+    }
 
     let sizes;
     let triangle;
 
-
     const triangleLeftDirection = `
       width: 0;
       height: 0;
-      border-top: ${options.triangleSize + 'px'} solid transparent;
-      border-bottom: ${options.triangleSize + 'px'} solid transparent;
-      border-right: ${options.triangleSize + 'px'} solid black;
+      border-top: ${options.triangleSize + "px"} solid transparent;
+      border-bottom: ${options.triangleSize + "px"} solid transparent;
+      border-right: ${options.triangleSize + "px"} solid black;
       position: absolute;
     `;
     const triangleRightDirection = `
       width: 0;
       height: 0;
       border-top:  ${options.triangleSize + "px"} solid transparent;
-      border-bottom: ${ options.triangleSize + "px"} solid transparent;
+      border-bottom: ${options.triangleSize + "px"} solid transparent;
       border-left:  ${options.triangleSize + "px"}  solid black;
       border-right:  ${options.triangleSize + "px"} solid transparent;
       position: absolute;
@@ -67,7 +79,6 @@
       right: 0;
     `;
 
-
     if (target === null) {
       console.error('Target is not detected, check option "target" or your HTML');
       return;
@@ -76,37 +87,30 @@
 
     let getContent = function(target) {
       let content = target.dataset.portal; // custom content
-      return content
+      return content;
+    };
 
-    }
-
-    const content = getContent(target)
+    const content = getContent(target);
     const portalBox = document.querySelector(content);
 
-     if (portalBox === null) {
-       console.error('Check in your html data atribute "data-portal", content not found');
-       return;
-     }
-
-    portalBox.className = "portal-box";
-
-
-
-    if (options.triangle) {
-
-      let el = document.createElement("div");
-      triangle = portalBox.appendChild(el);
-
+    if (portalBox === null) {
+      console.error('Check in your html data atribute "data-portal", content not found');
+      return;
     }
 
+    portalBox.className = "portal-box";
+    portalBox.style = "width: 100%";
 
+    if (options.triangle) {
+      let el = document.createElement("div");
+      triangle = portalBox.appendChild(el);
+    }
 
-    function getSize(portalBox, target) {
-
-
+    function getSize(portalBox, target, root) {
       let sizes = {
         root: {
-          height: document.getElementsByTagName("html")[0].offsetHeight
+          height: root.offsetHeight,
+          width: root.offsetWidth + scrollbarWidth
         },
         box: {
           width: portalBox.offsetWidth,
@@ -120,27 +124,24 @@
           width: options.triangleSize,
           height: options.triangleSize
         }
-
-
       };
       return sizes;
     }
-
-
 
     function getPosition(target, sizes) {
       const scrollTop = window.pageYOffset;
       const scrollWidth = window.pageXOffset;
       const coordinates = {};
-      const targetTop = target.getBoundingClientRect().top;
-      const targetLeft = target.getBoundingClientRect().left;
+      const targetTop = target.getBoundingClientRect().top
+      // console.log(target.offsetTop)
+      const targetLeft = target.getBoundingClientRect().left
       const heightCase = sizes.target.height > sizes.box.height;
 
       if (options.triangle) {
         coordinates.tr = {};
 
         function alignedTriangleY(element) {
-          return element.height / 2 - sizes.triangle.height
+          return element.height / 2 - sizes.triangle.height;
         }
 
         function alignedYCase1() {
@@ -148,16 +149,14 @@
             coordinates.tr.y = alignedTriangleY(sizes.box);
           }
         }
-
       }
-
 
       function arrangeBottom() {
         coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2 + scrollWidth;
         coordinates.y = targetTop + sizes.target.height + scrollTop + sizes.triangle.height;
 
         if (options.triangle) {
-          coordinates.tr.y = - sizes.triangle.height;
+          coordinates.tr.y = -sizes.triangle.height;
           coordinates.tr.x = 0;
           triangle.style = triangleBottomDirection;
         }
@@ -166,12 +165,12 @@
           return false;
         }
 
-        return true
+        return true;
       }
 
       function arrangeRight() {
         coordinates.x = targetLeft + sizes.target.width + sizes.triangle.width + scrollWidth;
-        coordinates.y = targetTop + scrollTop;
+        coordinates.y = targetTop + scrollTop
 
         if (options.triangle) {
           coordinates.tr.x = -sizes.triangle.width;
@@ -179,39 +178,38 @@
           alignedYCase1();
           triangle.style = triangleLeftDirection;
         }
-
-        if (coordinates.x + sizes.box.width > rootWidth) {
+        if (coordinates.x + sizes.box.width > sizes.root.width) {
           return false;
         }
-        return true
-
+        return true;
       }
 
       function arrangeLeft() {
         coordinates.x = targetLeft - sizes.box.width - sizes.triangle.width + scrollWidth;
         coordinates.y = targetTop + scrollTop;
 
-         if (options.triangle) {
-           coordinates.tr.x = sizes.box.width;
-           coordinates.tr.y = alignedTriangleY(sizes.target);
-           alignedYCase1();
-           triangle.style = triangleRightDirection;
-         }
+        if (options.triangle) {
+          coordinates.tr.x = sizes.box.width;
+          coordinates.tr.y = alignedTriangleY(sizes.target);
+          alignedYCase1();
+          triangle.style = triangleRightDirection;
+        }
 
         if (coordinates.x < rootLeft) {
           return false;
         }
-        return true
-
+        return true;
       }
 
       function arrangeTop() {
         coordinates.y = targetTop + scrollTop - sizes.box.height - sizes.triangle.height;
-        coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2 + scrollWidth;
-
+        coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2 + scrollWidth
+        // console.log(targetLeft);
+        console.log(target.clientLeft)
+        // console.log(target.offsetLeft)
         if (options.triangle) {
           coordinates.tr.y = sizes.box.height;
-          coordinates.tr.x = 0
+          coordinates.tr.x = 0;
           triangle.style = triangleTopDirection;
         }
 
@@ -219,101 +217,99 @@
           return false;
         }
 
-        return true
+        return true;
       }
 
-
       function conduct() {
-
         var positions = [arrangeLeft, arrangeRight, arrangeTop, arrangeBottom];
 
+        if (options.position === "left") {
 
-          if (options.position === "left") {
-            if (!positions[0]()) {
-              return positions[1]();
-            }
-            if (!positions[1]()) {
-              return positions[0]();
-            }
-              return positions[0]();
-          }
-
-
-
-          if (options.position === "right") {
-            console.log(positions[0]());
-            if (!positions[0]()) {
-
-               return positions[1]();
-            }
-            if (!positions[1]()) {
-              return positions[0]();
-            }
+          if (!positions[0]()) {
+            console.log(positions[1]())
             return positions[1]();
-
           }
-
-          if (options.position === "bottom") {
-            if (!positions[3]()) {
-              return positions[2]();
-            } else {
-              return positions[3]();
-            }
+          if (!positions[1]()) {
+            return positions[0]();
           }
+          return positions[0]();
+        }
 
+        if (options.position === "right") {
+          if (!positions[0]()) {
 
-          if (options.position === "top") {
-            if (!positions[2]()) {
-              return positions[3]();
-            }
-            else {
-              return positions[2]();
-            }
+            return positions[1]();
           }
+          if (!positions[1]()) {
+            return positions[0]();
+          }
+          return positions[1]();
+        }
+
+        if (options.position === "bottom") {
+          if (!positions[3]()) {
+            return positions[2]();
+          } else {
+            return positions[3]();
+          }
+        }
+
+        if (options.position === "top") {
+          if (!positions[2]()) {
+            return positions[3]();
+          } else {
+            return positions[2]();
+          }
+        }
       }
 
       conduct();
       return coordinates;
     }
 
-
-
-
     function setPosition(coordinates, portalBox, triangle) {
-
-      portalBox.style.transform = `translate(${coordinates.x}px, ${coordinates.y}px)`;
+      portalBox.style.left = coordinates.x + 'px';
+      portalBox.style.top = coordinates.y + 'px';
 
       if (options.triangle) {
         triangle.style.top = coordinates.tr.y + "px";
         triangle.style.left = coordinates.tr.x + "px";
       }
-
     }
 
-    document.addEventListener("DOMContentLoaded", ready);
+
     window.addEventListener("resize", handler1);
     target.addEventListener("click", handler);
-
+    document.addEventListener("DOMContentLoaded", ready);
+    // this.onload = function() {
+    //   // console.log("ready")
+    //   ready();
+    //   // setTimeout(() => {
+    //   //   ready();
+    //   // }, 1000);
+    // };
+    // ready()
     function ready() {
-      let sizes = getSize(portalBox, target);
+      let sizes = getSize(portalBox, target, root);
       draw(sizes);
     }
 
     function draw(sizes) {
-
       let coordinates = getPosition(target, sizes);
+      // console.log(coordinates)
       setPosition(coordinates, portalBox, triangle);
     }
 
     function handler() {
-      let sizes = getSize(portalBox, target); // get sizes only on click
+      let sizes = getSize(portalBox, target, root); // get sizes only on click
       draw(sizes);
       portalBox.classList.toggle("open");
-
     }
 
     function handler1() {
-      portalBox.classList.remove("open");
+      // portalBox.classList.remove("open");
+      let sizes = getSize(portalBox, target, root);
+      draw(sizes);
     }
 
     window.addEventListener("click", function(event) {
@@ -321,7 +317,7 @@
         portalBox.classList.remove("open");
       }
     });
-};
+  };;
 }());
 
 
@@ -334,6 +330,11 @@ function remove(node) {
 
 // createElement("div", ".container");
 // getSize(".test");
+// Portal({
+//   target: ".button-2",
+//   position: "right",
+//   triangle: true
+// });
 
 Portal({
   target: '.button-5',
@@ -353,30 +354,25 @@ Portal({
   triangle: true
 });
 
-Portal({
-  triangle: true,
-  target: '#custom-button',
-  position: 'left'
-});
+// Portal({
+//   triangle: true,
+//   target: '#custom-button',
+//   position: 'left'
+// });
 
-Portal({
-  target: ".button-2",
-  position: "right",
-  triangle: true
-});
 
 
 
 function shuffleRandom(nodes) {
   let elements = document.querySelectorAll(nodes)
-  let max = 1800;
+  let max = 300;
   let min = 200;
   elements.forEach(element => {
     element.style = "margin-left:" + Math.random() * (max - min) + min + "px";
   });
 }
 
-shuffleRandom(".button-open-portal");
+// shuffleRandom(".button-open-portal");
 
 
 
