@@ -163,17 +163,15 @@
         }
 
         if (coordinates.y + sizes.box.height > sizes.root.height) {
-
           return false;
         }
 
-        return coordinates;
+        return true
       }
 
       function arrangeRight() {
         coordinates.x = targetLeft + sizes.target.width + sizes.triangle.width + scrollWidth;
         coordinates.y = targetTop + scrollTop;
-        let position = "right";
 
         if (options.triangle) {
           coordinates.tr.x = -sizes.triangle.width;
@@ -185,14 +183,13 @@
         if (coordinates.x + sizes.box.width > rootWidth) {
           return false;
         }
+        return true
 
-        return position;
       }
 
       function arrangeLeft() {
         coordinates.x = targetLeft - sizes.box.width - sizes.triangle.width + scrollWidth;
         coordinates.y = targetTop + scrollTop;
-        let position = "left";
 
          if (options.triangle) {
            coordinates.tr.x = sizes.box.width;
@@ -204,8 +201,8 @@
         if (coordinates.x < rootLeft) {
           return false;
         }
+        return true
 
-        return position
       }
 
       function arrangeTop() {
@@ -222,13 +219,14 @@
           return false;
         }
 
-        return coordinates
+        return true
       }
 
 
       function conduct() {
 
-        let positions = [arrangeLeft, arrangeRight, arrangeTop, arrangeBottom];
+        var positions = [arrangeLeft, arrangeRight, arrangeTop, arrangeBottom];
+
 
           if (options.position === "left") {
             if (!positions[0]()) {
@@ -237,13 +235,15 @@
             if (!positions[1]()) {
               return positions[0]();
             }
-            return positions[0]();
+              return positions[0]();
           }
 
 
 
           if (options.position === "right") {
+            console.log(positions[0]());
             if (!positions[0]()) {
+
                return positions[1]();
             }
             if (!positions[1]()) {
