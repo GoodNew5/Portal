@@ -110,7 +110,7 @@
       let sizes = {
         root: {
           height: root.offsetHeight,
-          width: root.offsetWidth + scrollbarWidth
+          width: root.offsetWidth
         },
         box: {
           width: portalBox.offsetWidth,
@@ -237,7 +237,7 @@
 
         if (options.position === "right") {
           if (!positions[0]()) {
-
+            console.log("over left")
             return positions[1]();
           }
           if (!positions[1]()) {
@@ -330,11 +330,11 @@ function remove(node) {
 
 // createElement("div", ".container");
 // getSize(".test");
-// Portal({
-//   target: ".button-2",
-//   position: "right",
-//   triangle: true
-// });
+Portal({
+  target: ".button-2",
+  position: "right",
+  triangle: true
+});
 
 Portal({
   target: '.button-5',
@@ -354,11 +354,11 @@ Portal({
   triangle: true
 });
 
-// Portal({
-//   triangle: true,
-//   target: '#custom-button',
-//   position: 'left'
-// });
+Portal({
+  triangle: true,
+  target: '#custom-button',
+  position: 'left'
+});
 
 
 
