@@ -6,6 +6,12 @@
 
 "use strict"
 
+import { moduleA } from './test.js'
+import { RenderTriangle } from './modules/Triangle/RenderTriangle'
+import { Init } from './modules/Init'
+
+
+
 function Portal (options) {
   /**
    * @public base options
@@ -24,75 +30,12 @@ function Portal (options) {
   const rootLeft = root.clientLeft;
   const rootRight = root.clientRight;
   let triangle;
+  const portalBox = init(target);
 
   /**
    * triangle directions for various positions
    */
 
-  const triangleLeftDirection = `
-    width: 0;
-    height: 0;
-    border-top: ${options.triangleSize + "px"} solid transparent;
-    border-bottom: ${options.triangleSize + "px"} solid transparent;
-    border-right: ${options.triangleSize + "px"} solid black;
-    position: absolute;
-  `;
-  const triangleRightDirection = `
-    width: 0;
-    height: 0;
-    border-top:  ${options.triangleSize + "px"} solid transparent;
-    border-bottom: ${options.triangleSize + "px"} solid transparent;
-    border-left:  ${options.triangleSize + "px"}  solid black;
-    border-right:  ${options.triangleSize + "px"} solid transparent;
-    position: absolute;
-  `;
-  const triangleTopDirection = `
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-left:  ${options.triangleSize + "px"} solid transparent;
-    border-right:  ${options.triangleSize + "px"}  solid transparent;
-    border-top:  ${options.triangleSize + "px"} solid black;
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
-  `;
-  const triangleBottomDirection = `
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-left:  ${options.triangleSize + "px"} solid transparent;
-    border-right:  ${options.triangleSize + "px"}  solid transparent;
-    border-bottom:  ${options.triangleSize + "px"} solid black;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    right: 0;
-  `;
-
-  if (target === null) {
-    console.error('Target is not detected, check option "target" or your HTML');
-    return;
-  }
-
-  target.className = "button-open-portal";
-
-  let getContent = function(target) {
-    let content = target.dataset.portal; // custom content
-    return content;
-  };
-
-  const content = getContent(target);
-  const portalBox = document.querySelector(content);
-
-  if (portalBox === null) {
-    console.error('Check in your html data atribute "data-portal", content not found');
-    return;
-  }
-
-  portalBox.className = "portal-box";
-  portalBox.style = "width: 100%";
 
   if (options.triangle) {
     let el = document.createElement("div");
@@ -123,6 +66,10 @@ function Portal (options) {
 
   let sizes = getSize(portalBox, target, root);
 
+  this.test = function (name) {
+    console.log(" hello " + name)
+  }
+
   function getPosition(target, sizes) {
     const scrollTop = window.pageYOffset;
     const scrollWidth = window.pageXOffset;
@@ -143,6 +90,7 @@ function Portal (options) {
       }
     }
 
+
     function arrangeBottom() {
       coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2 + scrollWidth;
       coordinates.y = targetTop + sizes.target.height + scrollTop + sizes.triangle.height;
@@ -150,7 +98,7 @@ function Portal (options) {
       if (options.triangle) {
         coordinates.tr.y = -sizes.triangle.height;
         coordinates.tr.x = 0;
-        triangle.style = triangleBottomDirection;
+        triangle.style = RenderTriangle("bottom", options.triangleSize);
       }
 
       if (coordinates.y + sizes.box.height > sizes.root.height) {
@@ -168,7 +116,7 @@ function Portal (options) {
         coordinates.tr.x = -sizes.triangle.width;
         coordinates.tr.y = alignedTriangleY(sizes.target);
         alignedYCase1();
-        triangle.style = triangleLeftDirection;
+        triangle.style = RenderTriangle("left", options.triangleSize);
       }
       if (coordinates.x + sizes.box.width > sizes.root.width) {
         return false;
@@ -184,7 +132,7 @@ function Portal (options) {
         coordinates.tr.x = sizes.box.width;
         coordinates.tr.y = alignedTriangleY(sizes.target);
         alignedYCase1();
-        triangle.style = triangleRightDirection;
+        triangle.style = RenderTriangle("right", options.triangleSize);
       }
 
       if (coordinates.x < rootLeft) {
@@ -200,7 +148,7 @@ function Portal (options) {
       if (options.triangle) {
         coordinates.tr.y = sizes.box.height;
         coordinates.tr.x = 0;
-        triangle.style = triangleTopDirection;
+        triangle.style = RenderTriangle("top", options.triangleSize);
       }
 
       if (coordinates.y < rootTop) {
@@ -301,17 +249,28 @@ function Portal (options) {
   };;
 
 
-// for test
-function remove(node) {
-  var el = document.querySelector(node);
-  document.body.removeChild(el);
+
+function User() {
+  let a = 2;
+  this.name = "Alex"
+  console.log(this)
 }
+
+let user = new User();
+// console.log(user.name)
+// function remove(node) {
+//   var el = document.querySelector(node);
+//   document.body.removeChild(el);
+// }
+
 
 const PortalRight = new Portal({
   target: ".button-2",
   position: "right",
   triangle: true
 });
+
+PortalRight.test('Alex')
 
 const PortalTop = new Portal({
   target: '.button-5',
@@ -349,4 +308,4 @@ function shuffleRandom(nodes) {
   });
 }
 
-shuffleRandom(".button-open-portal");
+// shuffleRandom(".button-open-portal");
