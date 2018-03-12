@@ -1,7 +1,8 @@
 let Init = function (target) {
+
   if (target === null) {
     console.error('Target is not detected, check option "target" or your HTML');
-    return;
+    return false
   }
 
   target.className = "button-open-portal";
@@ -12,7 +13,7 @@ let Init = function (target) {
     console.error(
       'Check in your html data atribute "data-portal", content not found'
     );
-    return;
+    return false
   }
 
   portalBox.className = "portal-box";

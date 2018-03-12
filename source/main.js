@@ -30,12 +30,13 @@ function Portal (options) {
   const rootLeft = root.clientLeft;
   const rootRight = root.clientRight;
   let triangle;
-  const portalBox = init(target);
+  const portalBox = Init(target);
 
-  /**
-   * triangle directions for various positions
-   */
+  if (!portalBox) {
+    return
+  }
 
+  let sizes = getSize(portalBox, target, root);
 
   if (options.triangle) {
     let el = document.createElement("div");
@@ -62,12 +63,6 @@ function Portal (options) {
       }
     };
     return sizes;
-  }
-
-  let sizes = getSize(portalBox, target, root);
-
-  this.test = function (name) {
-    console.log(" hello " + name)
   }
 
   function getPosition(target, sizes) {
@@ -246,7 +241,7 @@ function Portal (options) {
       portalBox.classList.remove("open");
     }
   });
-  };;
+};;
 
 
 
@@ -270,10 +265,10 @@ const PortalRight = new Portal({
   triangle: true
 });
 
-PortalRight.test('Alex')
+// PortalRight.test('Alex')
 
 const PortalTop = new Portal({
-  target: '.button-5',
+  target: '.button-5FF',
   position: 'top',
   triangle: true
 });
