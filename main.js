@@ -1,8 +1,14 @@
+/**
+ *  @version 0.1
+ *  @author Alexander Veselov
+ *  @todo responsive
+ */
 
 (function () {
   ("use strict");
 
   this.Portal = function(options) {
+
     /**
      * @public base options
      */
@@ -19,10 +25,7 @@
     const rootTop = root.clientTop;
     const rootLeft = root.clientLeft;
     const rootRight = root.clientRight;
-
-    let sizes;
     let triangle;
-
 
     /**
      * triangle directions for various positions
@@ -74,6 +77,7 @@
       console.error('Target is not detected, check option "target" or your HTML');
       return;
     }
+
     target.className = "button-open-portal";
 
     let getContent = function(target) {
@@ -118,6 +122,8 @@
       };
       return sizes;
     }
+
+    let sizes = getSize(portalBox, target, root);
 
     function getPosition(target, sizes) {
       const scrollTop = window.pageYOffset;
@@ -272,32 +278,24 @@
     }
 
 
-    window.addEventListener("resize", handler1);
-    target.addEventListener("click", handler);
+    window.addEventListener("resize", displacement);
+    target.addEventListener("click", displacement);
     document.addEventListener("DOMContentLoaded", ready);
 
     function ready() {
       let sizes = getSize(portalBox, target, root);
-      console.log(sizes.root.height)
       draw(sizes);
     }
 
     function draw(sizes) {
       let coordinates = getPosition(target, sizes);
-      // console.log(coordinates)
       setPosition(coordinates, portalBox, triangle);
     }
 
-    function handler() {
-      let sizes = getSize(portalBox, target, root); // get sizes only on click
-      draw(sizes);
-      portalBox.classList.toggle("open");
-    }
-
-    function handler1() {
-      // portalBox.classList.remove("open");
+    function displacement(event) {
       let sizes = getSize(portalBox, target, root);
       draw(sizes);
+      event.type != "resize" ? portalBox.classList.toggle("open") : false;
     }
 
     window.addEventListener("click", function(event) {
@@ -348,8 +346,6 @@ Portal({
   target: '#custom-button',
   position: 'left'
 });
-
-
 
 
 function shuffleRandom(nodes) {
