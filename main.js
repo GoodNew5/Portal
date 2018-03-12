@@ -19,23 +19,14 @@
     const rootTop = root.clientTop;
     const rootLeft = root.clientLeft;
     const rootRight = root.clientRight;
-    const scrollbarWidth = getScrollBarWidth();
-
-    function getScrollBarWidth() {
-      let scrollDiv = document.createElement("div");
-      scrollDiv.style.overflowY = "scroll";
-      scrollDiv.style.width = "50px";
-      scrollDiv.style.height = "50px";
-      scrollDiv.style.visibility = "hidden";
-      document.body.appendChild(scrollDiv);
-      let scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
-      document.body.removeChild(scrollDiv);
-      return scrollbarWidth
-
-    }
 
     let sizes;
     let triangle;
+
+
+    /**
+     * triangle directions for various positions
+     */
 
     const triangleLeftDirection = `
       width: 0;
@@ -133,7 +124,6 @@
       const scrollWidth = window.pageXOffset;
       const coordinates = {};
       const targetTop = target.getBoundingClientRect().top
-      // console.log(target.offsetTop)
       const targetLeft = target.getBoundingClientRect().left
       const heightCase = sizes.target.height > sizes.box.height;
 
@@ -204,9 +194,7 @@
       function arrangeTop() {
         coordinates.y = targetTop + scrollTop - sizes.box.height - sizes.triangle.height;
         coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2 + scrollWidth
-        // console.log(targetLeft);
-        console.log(target.clientLeft)
-        // console.log(target.offsetLeft)
+
         if (options.triangle) {
           coordinates.tr.y = sizes.box.height;
           coordinates.tr.x = 0;
@@ -220,50 +208,56 @@
         return true;
       }
 
-      function conduct() {
-        var positions = [arrangeLeft, arrangeRight, arrangeTop, arrangeBottom];
+      function conductor() {
+        let xPositions = [arrangeLeft, arrangeRight];
 
-        if (options.position === "left") {
+        if (options.position === "left" || options.position === "right") {
 
-          if (!positions[0]()) {
-            console.log(positions[1]())
-            return positions[1]();
-          }
-          if (!positions[1]()) {
-            return positions[0]();
-          }
-          return positions[0]();
+          xPositions.forEach(function() {
+
+            if (!xPositions[0]()) {
+              return xPositions[1]();
+            }
+
+            if (!xPositions[1]()) {
+              return xPositions[0]();
+            }
+
+            if (options.position === "left") {
+              return xPositions[0]();
+            }
+
+            if (options.position === "right") {
+              return xPositions[1]();
+            }
+          });
         }
 
-        if (options.position === "right") {
-          if (!positions[0]()) {
-            console.log("over left")
-            return positions[1]();
-          }
-          if (!positions[1]()) {
-            return positions[0]();
-          }
-          return positions[1]();
-        }
+        if (options.position === "top" || options.position === "bottom") {
 
-        if (options.position === "bottom") {
-          if (!positions[3]()) {
-            return positions[2]();
-          } else {
-            return positions[3]();
-          }
-        }
+          let yPositions = [arrangeTop, arrangeBottom];
 
-        if (options.position === "top") {
-          if (!positions[2]()) {
-            return positions[3]();
-          } else {
-            return positions[2]();
-          }
+          yPositions.forEach(function() {
+            if (!yPositions[0]()) {
+              return yPositions[1]();
+            }
+
+            if (!yPositions[1]()) {
+              return yPositions[0]();
+            }
+
+            if (options.position === "bottom") {
+              return yPositions[1]();
+            }
+
+            if (options.position === "top") {
+              return yPositions[0]();
+            }
+          });
         }
       }
 
-      conduct();
+      conductor();
       return coordinates;
     }
 
@@ -281,16 +275,10 @@
     window.addEventListener("resize", handler1);
     target.addEventListener("click", handler);
     document.addEventListener("DOMContentLoaded", ready);
-    // this.onload = function() {
-    //   // console.log("ready")
-    //   ready();
-    //   // setTimeout(() => {
-    //   //   ready();
-    //   // }, 1000);
-    // };
-    // ready()
+
     function ready() {
       let sizes = getSize(portalBox, target, root);
+      console.log(sizes.root.height)
       draw(sizes);
     }
 
@@ -330,6 +318,7 @@ function remove(node) {
 
 // createElement("div", ".container");
 // getSize(".test");
+
 Portal({
   target: ".button-2",
   position: "right",
@@ -365,7 +354,7 @@ Portal({
 
 function shuffleRandom(nodes) {
   let elements = document.querySelectorAll(nodes)
-  let max = 300;
+  let max = 2000;
   let min = 200;
   elements.forEach(element => {
     element.style = "margin-left:" + Math.random() * (max - min) + min + "px";

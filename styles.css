@@ -64,7 +64,7 @@ body, html {
   max-width: 100px;
   /* max-width: 800px; */
   /* min-height: 100px; */
-  transition: .3s opacity, left, top;
+  transition: .3s left, top;
   /* width: 150px; */
   position: absolute;
   /* width: 100%; */
