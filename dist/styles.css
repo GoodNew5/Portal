@@ -64,7 +64,7 @@ body, html {
   max-width: 600px;
   /* max-width: 800px; */
   /* min-height: 100px; */
-  transition: .3s left, top;
+  transition: .3s left, top ease-in;
   /* width: 150px; */
   position: absolute;
   /* width: 100%; */

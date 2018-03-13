@@ -2,6 +2,7 @@
  *  @version 0.1
  *  @author Alexander Veselov
  *  @todo responsive
+ *  @todo Portal Preview
  */
 
 "use strict"
@@ -24,13 +25,20 @@ function Portal (options) {
     position: options.position || "bottom"
   };
 
-  const target = document.querySelector(options.target);
+
   const root = document.getElementsByTagName("html")[0];
   const rootTop = root.clientTop;
   const rootLeft = root.clientLeft;
   const rootRight = root.clientRight;
   let triangle;
-  const portalBox = Init(target);
+  const InitPortal = new Init(options.target);
+  const target = options.target === undefined ? InitPortal.renderPreview() : InitPortal.renderTarget();
+
+  if (!target) {
+    return
+  }
+
+  const portalBox = InitPortal.renderPortalBox(target);
 
   if (!portalBox) {
     return
@@ -265,10 +273,10 @@ const PortalRight = new Portal({
   triangle: true
 });
 
-// PortalRight.test('Alex')
+// // PortalRight.test('Alex')
 
 const PortalTop = new Portal({
-  target: '.button-5FF',
+  target: '.button-5',
   position: 'top',
   triangle: true
 });
@@ -287,8 +295,13 @@ const PortalBottom = new Portal({
 
 const PortalLeft = new Portal({
   triangle: true,
-  target: '#custom-button',
-  position: 'left'
+  position: 'left',
+  target: "#custom-button"
+});
+
+const PortalPreview = new Portal({
+  position: 'top',
+  triangle: true
 });
 
 

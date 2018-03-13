@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "uglify-js": "2",
     "wepback": "^1.0.0"
   },
   "scripts": {
