@@ -29,6 +29,12 @@ let Init = function(targetButton) {
     return target;
   };
 
+  this.renderTriangle = function (where) {
+    let triangle = document.createElement("div");
+    where.appendChild(triangle);
+    return triangle
+  }
+
   this.renderPortalBox = function(target) {
     let portal = document.querySelector(target.dataset.portal);
 
@@ -39,7 +45,7 @@ let Init = function(targetButton) {
       return false;
     }
     portal.className = "portal-box";
-    portal.style = "width: 100%";
+    portal.style = "width: 100%;"
     return portal;
   };
 };

@@ -1,4 +1,4 @@
-let RenderTriangleCSS = function (direction, size) {
+let RenderTriangleCSS = function(direction, size) {
   if (direction === "left") {
     return `
       width: 0;
@@ -16,7 +16,6 @@ let RenderTriangleCSS = function (direction, size) {
       border-top:  ${size + "px"} solid transparent;
       border-bottom: ${size + "px"} solid transparent;
       border-left:  ${size + "px"}  solid black;
-      border-right:  ${size + "px"} solid transparent;
       position: absolute;
     `;
   }
@@ -27,7 +26,6 @@ let RenderTriangleCSS = function (direction, size) {
       height: 0;
       border-left:  ${size + "px"} solid transparent;
       border-right:  ${size + "px"}  solid transparent;
-      border-bottom:  ${size + "px"}  solid transparent;
       border-top:  ${size + "px"} solid black;
       left: 0;
       right: 0;
@@ -49,5 +47,24 @@ let RenderTriangleCSS = function (direction, size) {
       right: 0;
     `;
   }
+};
+
+let RenderTriangleDirections = function (position, size) {
+
+  let directions = [];
+  let positions = ["left", "right", "top", "bottom"];
+
+  positions.forEach(item => {
+    directions.push(RenderTriangleCSS(item, size));
+  });
+
+  let triangles = {
+    left: directions[0],
+    right: directions[1],
+    top: directions[2],
+    bottom: directions[3]
+  };
+
+  return triangles[position];
 }
-export { RenderTriangleCSS };
+export { RenderTriangleDirections }

@@ -8,21 +8,22 @@
 "use strict"
 
 import { moduleA } from './test.js'
-import { RenderTriangle } from './modules/Triangle/RenderTriangle'
+import { RenderTriangleDirections } from './modules/RenderTriangleDirections'
 import { Init } from './modules/Init'
 
 
 
 function Portal (options) {
+
   /**
    * @public base options
    */
-
   options = {
     target: options.target,
     triangle: options.triangle || false,
     triangleSize: options.triangle ? options.triangleSize || 10 : 0,
-    position: options.position || "bottom"
+    position: options.position || "bottom",
+    hover: options.hover === undefined ? true : options.hover
   };
 
 
@@ -30,7 +31,6 @@ function Portal (options) {
   const rootTop = root.clientTop;
   const rootLeft = root.clientLeft;
   const rootRight = root.clientRight;
-  let triangle;
   const InitPortal = new Init(options.target);
   const target = options.target === undefined ? InitPortal.renderPreview() : InitPortal.renderTarget();
 
@@ -44,12 +44,12 @@ function Portal (options) {
     return
   }
 
+  let triangle = options.triangle ? InitPortal.renderTriangle(portalBox) : null
+
+
   let sizes = getSize(portalBox, target, root);
 
-  if (options.triangle) {
-    let el = document.createElement("div");
-    triangle = portalBox.appendChild(el);
-  }
+
 
   function getSize(portalBox, target, root) {
     let sizes = {
@@ -68,8 +68,12 @@ function Portal (options) {
       triangle: {
         width: options.triangleSize,
         height: options.triangleSize
+      },
+      triangleWrapper: {
+        width: options.triangleSize
       }
     };
+
     return sizes;
   }
 
@@ -101,7 +105,7 @@ function Portal (options) {
       if (options.triangle) {
         coordinates.tr.y = -sizes.triangle.height;
         coordinates.tr.x = 0;
-        triangle.style = RenderTriangle("bottom", options.triangleSize);
+        triangle.style = RenderTriangleDirections("bottom", options.triangleSize);
       }
 
       if (coordinates.y + sizes.box.height > sizes.root.height) {
@@ -119,7 +123,7 @@ function Portal (options) {
         coordinates.tr.x = -sizes.triangle.width;
         coordinates.tr.y = alignedTriangleY(sizes.target);
         alignedYCase1();
-        triangle.style = RenderTriangle("left", options.triangleSize);
+        triangle.style = RenderTriangleDirections("left", options.triangleSize);
       }
       if (coordinates.x + sizes.box.width > sizes.root.width) {
         return false;
@@ -135,7 +139,7 @@ function Portal (options) {
         coordinates.tr.x = sizes.box.width;
         coordinates.tr.y = alignedTriangleY(sizes.target);
         alignedYCase1();
-        triangle.style = RenderTriangle("right", options.triangleSize);
+        triangle.style = RenderTriangleDirections("right", options.triangleSize);
       }
 
       if (coordinates.x < rootLeft) {
@@ -149,9 +153,9 @@ function Portal (options) {
       coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2 + scrollWidth
 
       if (options.triangle) {
-        coordinates.tr.y = sizes.box.height;
+        coordinates.tr.y = sizes.box.height
         coordinates.tr.x = 0;
-        triangle.style = RenderTriangle("top", options.triangleSize);
+        triangle.style = RenderTriangleDirections("top", options.triangleSize);
       }
 
       if (coordinates.y < rootTop) {
@@ -214,19 +218,54 @@ function Portal (options) {
   }
 
   function setPosition(coordinates, portalBox, triangle) {
-    portalBox.style.left = coordinates.x + 'px';
-    portalBox.style.top = coordinates.y + 'px';
+    portalBox.style.left = coordinates.x + "px";
+    portalBox.style.top = coordinates.y + "px";
+
 
     if (options.triangle) {
       triangle.style.top = coordinates.tr.y + "px";
       triangle.style.left = coordinates.tr.x + "px";
     }
   }
+   function showPortal() {
+
+     if (!options.hover) {
+       portalBox.classList.toggle("open");
+     }
+
+     else {
+       portalBox.classList.add("open");
+     }
+   }
+
+   function hiddenPortal(event) {
+    // for click
+    function removeClass() {
+      portalBox.classList.remove("open");
+    }
+
+    if (!options.hover) {
+      if (!target.contains(event.target) && event.target != portalBox && !portalBox.contains(event.target)) {
+        removeClass()
+      }
+    }
+
+    else {
+      if (!(portalBox.contains(event.relatedTarget))) {
+        removeClass();
+      }
+    }
+   }
+
+  let eventsForShow = !options.hover ? "click" : "mouseover"
+  let eventsForHidden = !options.hover ? "click" : "mouseout"
 
 
   window.addEventListener("resize", displacement);
-  target.addEventListener("click", displacement);
   document.addEventListener("DOMContentLoaded", ready);
+
+  target.addEventListener(eventsForShow, displacement);
+  window.addEventListener(eventsForHidden, hiddenPortal);
 
   function ready() {
     let sizes = getSize(portalBox, target, root);
@@ -241,14 +280,8 @@ function Portal (options) {
   function displacement(event) {
     let sizes = getSize(portalBox, target, root);
     draw(sizes);
-    event.type != "resize" ? portalBox.classList.toggle("open") : false;
+    event.type != "resize" ? showPortal() : false;
   }
-
-  window.addEventListener("click", function(event) {
-    if (event.target != target && !target.contains(event.target) && event.target != portalBox && !portalBox.contains(event.target)) {
-      portalBox.classList.remove("open");
-    }
-  });
 };;
 
 
@@ -270,7 +303,8 @@ let user = new User();
 const PortalRight = new Portal({
   target: ".button-2",
   position: "right",
-  triangle: true
+  triangle: true,
+  hover: false
 });
 
 // // PortalRight.test('Alex')
@@ -284,7 +318,7 @@ const PortalTop = new Portal({
 const PortalTopNew = new Portal({
   target: '.button-4',
   position: 'top',
-  triangle: true
+  triangle: false
 });
 
 const PortalBottom = new Portal({
@@ -296,6 +330,7 @@ const PortalBottom = new Portal({
 const PortalLeft = new Portal({
   triangle: true,
   position: 'left',
+  hover: false,
   target: "#custom-button"
 });
 
