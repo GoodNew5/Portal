@@ -45,7 +45,7 @@ let Init = function(targetButton) {
       return false;
     }
     portal.className = "portal-box";
-    portal.style = "width: 100%;"
+    portal.style = "position: absolute;"
     return portal;
   };
 };

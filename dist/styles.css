@@ -24,6 +24,7 @@ body, html {
   color: black;
   width: 100px;
   /* height: 40px; */
+  border: 4px black solid;
   font-size: 15px;
   text-align: center;
   cursor: pointer;
@@ -47,7 +48,7 @@ body, html {
 .test {
   width: 0;
   height: 0;
-  border: 10px black solid;
+  border-left: 10px black solid;
 }
 .portal {
   position: relative;
@@ -66,17 +67,14 @@ body, html {
   /* min-height: 100px; */
   /* transition: .3s ease-in; */
   /* width: 150px; */
-  position: absolute;
   /* width: 100%; */
   padding: 10px;
   background-color: black;
   display: block;
   color: white;
-  top: 0;
   /* display: none; */
   /* left: 0; */
   z-index: 2;
-  /* display: flex; */
   /* align-items: center; */
   /* justify-content: center; */
   /* border-radius: 5px; */
@@ -87,7 +85,7 @@ body, html {
 }
 @media (min-width: 760px) {
   .portal-box {
-    max-width: 600px;
+    /* max-width: 600px; */
   }
 }
 
@@ -99,7 +97,22 @@ body, html {
 }
 .portal-1, .portal-2, .portal-3, .portal-4, .portal-5 {
   padding: .1px;
-  /* margin: 200px; */
+  margin: 50px;
+  position: relative;
+  /* border-left: 20px black solid; */
+  border-right: 40px black solid;
+  border-top: 30px gold solid;
+  padding: 40px;
+}
+.outer-portal {
+  margin: 40px;
+  padding: .1px;
+
+
+
+}
+.test-more {
+  margin: 90px;
 }
 .portal-1 {
   background: lime;

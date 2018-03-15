@@ -16,7 +16,7 @@ import { Init } from './modules/Init'
 function Portal (options) {
 
   /**
-   * @public base options
+   * @param {node} target - Элемент-якорь относительно которого задана позиция
    */
   options = {
     target: options.target,
@@ -54,8 +54,7 @@ function Portal (options) {
   function getSize(portalBox, target, root) {
     let sizes = {
       root: {
-        height: root.offsetHeight,
-        width: root.offsetWidth
+        height: root.offsetHeight
       },
       box: {
         width: portalBox.offsetWidth,
@@ -68,9 +67,6 @@ function Portal (options) {
       triangle: {
         width: options.triangleSize,
         height: options.triangleSize
-      },
-      triangleWrapper: {
-        width: options.triangleSize
       }
     };
 
@@ -81,11 +77,13 @@ function Portal (options) {
     const scrollTop = window.pageYOffset;
     const scrollWidth = window.pageXOffset;
     const coordinates = {};
-    const targetTop = target.getBoundingClientRect().top
-    const targetLeft = target.getBoundingClientRect().left
+    const borderLeftWidth = computedBordersWidth(getComputedStyle(target.offsetParent).borderLeftWidth);
+    const borderTopWidth = computedBordersWidth(getComputedStyle(target.offsetParent).borderTopWidth);
+    const targetTop = target.getBoundingClientRect().top  - target.offsetParent.getBoundingClientRect().top - borderTopWidth - scrollTop;
+    const targetLeft = target.getBoundingClientRect().left - target.offsetParent.getBoundingClientRect().left - borderLeftWidth - scrollWidth;
     const heightCase = sizes.target.height > sizes.box.height;
 
-    options.triangle ? coordinates.tr = {} : false
+    options.triangle ? coordinates.tr = {} : null
 
     function alignedTriangleY(element) {
       return element.height / 2 - sizes.triangle.height;
@@ -96,6 +94,12 @@ function Portal (options) {
         return coordinates.tr.y = alignedTriangleY(sizes.box);
       }
     }
+    function computedBordersWidth(border) {
+      const width = Number(border.match(/\d+/, ""))
+
+      return width
+    }
+
 
 
     function arrangeBottom() {
@@ -125,7 +129,7 @@ function Portal (options) {
         alignedYCase1();
         triangle.style = RenderTriangleDirections("left", options.triangleSize);
       }
-      if (coordinates.x + sizes.box.width > sizes.root.width) {
+      if ((coordinates.x + borderLeftWidth) + sizes.box.width > target.offsetParent.offsetWidth) {
         return false;
       }
       return true;
@@ -133,7 +137,7 @@ function Portal (options) {
 
     function arrangeLeft() {
       coordinates.x = targetLeft - sizes.box.width - sizes.triangle.width + scrollWidth;
-      coordinates.y = targetTop + scrollTop;
+      coordinates.y = targetTop + scrollTop
 
       if (options.triangle) {
         coordinates.tr.x = sizes.box.width;
@@ -173,10 +177,12 @@ function Portal (options) {
         xPositions.forEach(function() {
 
           if (!xPositions[0]()) {
+            console.log("over left")
             return xPositions[1]();
           }
 
           if (!xPositions[1]()) {
+             console.log("over right");
             return xPositions[0]();
           }
 
@@ -218,8 +224,9 @@ function Portal (options) {
   }
 
   function setPosition(coordinates, portalBox, triangle) {
-    portalBox.style.left = coordinates.x + "px";
-    portalBox.style.top = coordinates.y + "px";
+    portalBox.style.top = 0
+    portalBox.style.left = 0
+    portalBox.style.transform = "translate(" + coordinates.x + "px" + "," + coordinates.y + "px" + ")"
 
 
     if (options.triangle) {
@@ -268,6 +275,7 @@ function Portal (options) {
   window.addEventListener(eventsForHidden, hiddenPortal);
 
   function ready() {
+
     let sizes = getSize(portalBox, target, root);
     draw(sizes);
   }
@@ -279,6 +287,7 @@ function Portal (options) {
 
   function displacement(event) {
     let sizes = getSize(portalBox, target, root);
+
     draw(sizes);
     event.type != "resize" ? showPortal() : false;
   }
@@ -307,7 +316,7 @@ const PortalRight = new Portal({
   hover: false
 });
 
-// // PortalRight.test('Alex')
+// // // PortalRight.test('Alex')
 
 const PortalTop = new Portal({
   target: '.button-5',
@@ -315,17 +324,17 @@ const PortalTop = new Portal({
   triangle: true
 });
 
-const PortalTopNew = new Portal({
-  target: '.button-4',
-  position: 'top',
-  triangle: false
-});
+// const PortalTopNew = new Portal({
+//   target: '.button-4',
+//   position: 'top',
+//   triangle: false
+// });
 
-const PortalBottom = new Portal({
-  target: ".button-3",
-  position: "bottom",
-  triangle: true
-});
+// const PortalBottom = new Portal({
+//   target: ".button-3",
+//   position: "bottom",
+//   triangle: true
+// });
 
 const PortalLeft = new Portal({
   triangle: true,
@@ -334,10 +343,10 @@ const PortalLeft = new Portal({
   target: "#custom-button"
 });
 
-const PortalPreview = new Portal({
-  position: 'top',
-  triangle: true
-});
+// const PortalPreview = new Portal({
+//   position: 'top',
+//   triangle: true
+// });
 
 
 
@@ -351,4 +360,15 @@ function shuffleRandom(nodes) {
   });
 }
 
-// shuffleRandom(".button-open-portal");
+shuffleRandom(".button-open-portal");
+
+function getSize(node) {
+  let el = document.getElementById(node)
+  let sizes = {
+    width: el.offsetWidth,
+    height: el.offsetHeight,
+  }
+  console.log(sizes)
+}
+
+// getSize("custom-button");
