@@ -1,14 +1,14 @@
 /**
- *  @version 0.1
+ *  @version 0.2
  *  @author Alexander Veselov
  *  @todo responsive
- *  @todo Portal Preview
+ *
  */
 
 "use strict"
 
 import { moduleA } from './test.js'
-import { RenderTriangleDirections } from './modules/RenderTriangleDirections'
+import { Triangle } from './modules/Triangle'
 import { Init } from './modules/Init'
 
 
@@ -18,6 +18,7 @@ function Portal (options) {
   /**
    * @param {node} target - Элемент-якорь относительно которого задана позиция
    */
+
   options = {
     target: options.target,
     triangle: options.triangle || false,
@@ -76,12 +77,16 @@ function Portal (options) {
   function getPosition(target, sizes) {
     const scrollTop = window.pageYOffset;
     const scrollWidth = window.pageXOffset;
+    const parentScrollTop = target.offsetParent.scrollTop;
+    const parentScrollLeft = target.offsetParent.scrollLeft
     const coordinates = {};
     const borderLeftWidth = computedBordersWidth(getComputedStyle(target.offsetParent).borderLeftWidth);
     const borderTopWidth = computedBordersWidth(getComputedStyle(target.offsetParent).borderTopWidth);
-    const targetTop = target.getBoundingClientRect().top  - target.offsetParent.getBoundingClientRect().top - borderTopWidth - scrollTop;
-    const targetLeft = target.getBoundingClientRect().left - target.offsetParent.getBoundingClientRect().left - borderLeftWidth - scrollWidth;
+    const targetTop = target.getBoundingClientRect().top - target.offsetParent.getBoundingClientRect().top - borderTopWidth
+    const targetLeft = target.getBoundingClientRect().left - target.offsetParent.getBoundingClientRect().left - borderLeftWidth
     const heightCase = sizes.target.height > sizes.box.height;
+    const positionHorizontal = options.position === "left" || options.position === "right";
+    const positionVertical = options.position === "top" || options.position === "bottom";
 
     options.triangle ? coordinates.tr = {} : null
 
@@ -96,93 +101,128 @@ function Portal (options) {
     }
     function computedBordersWidth(border) {
       const width = Number(border.match(/\d+/, ""))
-
       return width
     }
 
 
 
     function arrangeBottom() {
-      coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2 + scrollWidth;
-      coordinates.y = targetTop + sizes.target.height + scrollTop + sizes.triangle.height;
+      coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2
+      coordinates.y = targetTop + sizes.target.height + sizes.triangle.height;
+
+      if (coordinates.y + sizes.box.height > sizes.root.height) {
+        return false;
+      }
 
       if (options.triangle) {
         coordinates.tr.y = -sizes.triangle.height;
         coordinates.tr.x = 0;
-        triangle.style = RenderTriangleDirections("bottom", options.triangleSize);
-      }
-
-      if (coordinates.y + sizes.box.height > sizes.root.height) {
-        return false;
+        triangle.style = Triangle("bottom", options.triangleSize);
       }
 
       return true;
     }
 
     function arrangeRight() {
-      coordinates.x = targetLeft + sizes.target.width + sizes.triangle.width + scrollWidth;
-      coordinates.y = targetTop + scrollTop
+      coordinates.x = targetLeft + sizes.target.width + sizes.triangle.width
+      coordinates.y = targetTop
+      let overCondHorizontal = coordinates.x + sizes.box.width > target.offsetParent.offsetWidth
+      let overCondVertical = coordinates.x - sizes.triangle.width + sizes.box.width / 2 > target.offsetParent.offsetWidth
+
+      if ((positionHorizontal && overCondHorizontal) || (positionVertical && overCondVertical)) {
+        return false;
+      }
 
       if (options.triangle) {
         coordinates.tr.x = -sizes.triangle.width;
         coordinates.tr.y = alignedTriangleY(sizes.target);
         alignedYCase1();
-        triangle.style = RenderTriangleDirections("left", options.triangleSize);
-      }
-      if ((coordinates.x + borderLeftWidth) + sizes.box.width > target.offsetParent.offsetWidth) {
-        return false;
+        triangle.style = Triangle("left", options.triangleSize);
       }
       return true;
+
     }
 
     function arrangeLeft() {
-      coordinates.x = targetLeft - sizes.box.width - sizes.triangle.width + scrollWidth;
-      coordinates.y = targetTop + scrollTop
+      coordinates.x = targetLeft - sizes.box.width - sizes.triangle.width;
+      coordinates.y = targetTop
+      let overCondVertical = coordinates.x - sizes.triangle.width + sizes.box.width / 2 < rootLeft
+      let overCondHorizontal = coordinates.x < rootLeft
+
+      if ((positionHorizontal && overCondHorizontal) || (positionVertical && overCondVertical)) {
+        return false;
+      }
 
       if (options.triangle) {
         coordinates.tr.x = sizes.box.width;
         coordinates.tr.y = alignedTriangleY(sizes.target);
         alignedYCase1();
-        triangle.style = RenderTriangleDirections("right", options.triangleSize);
+        triangle.style = Triangle("right", options.triangleSize);
       }
+      return true
 
-      if (coordinates.x < rootLeft) {
-        return false;
-      }
-      return true;
     }
 
     function arrangeTop() {
-      coordinates.y = targetTop + scrollTop - sizes.box.height - sizes.triangle.height;
-      coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2 + scrollWidth
+      coordinates.y = targetTop - sizes.box.height - sizes.triangle.height;
+      coordinates.x = targetLeft - (sizes.box.width - sizes.target.width) / 2
+
+
+      if (coordinates.y < target.offsetParent.getBoundingClientRect().top + scrollTop) {
+
+        return false;
+      }
 
       if (options.triangle) {
         coordinates.tr.y = sizes.box.height
         coordinates.tr.x = 0;
-        triangle.style = RenderTriangleDirections("top", options.triangleSize);
+        triangle.style = Triangle("top", options.triangleSize);
       }
 
-      if (coordinates.y < rootTop) {
-        return false;
-      }
+      return true
+    }
 
-      return true;
+    function flipRight () {
+      coordinates.y = targetTop - sizes.box.height - sizes.triangle.height
+      coordinates.x = targetLeft - sizes.box.width + sizes.target.width
+
+      if (options.triangle) {
+        coordinates.tr.y = sizes.box.height;
+        coordinates.tr.x = sizes.box.width - (sizes.target.width / 2) - sizes.triangle.width
+        triangle.style = Triangle("top", options.triangleSize, false)
+      }
+      return true
+    }
+
+    function flipLeft() {
+      coordinates.y = targetTop - sizes.box.height - sizes.triangle.height
+      coordinates.x = targetLeft
+
+      if (options.triangle) {
+        coordinates.tr.y = sizes.box.height;
+        coordinates.tr.x = sizes.target.width / 2 - sizes.triangle.width
+        triangle.style = Triangle("top", options.triangleSize, false);
+      }
+      return true
+    }
+
+    function flipBottomRight() {
+      console.log("lfll")
     }
 
     function conductor() {
-
+      let xPositions = [arrangeLeft, arrangeRight];
       if (options.position === "left" || options.position === "right") {
-        let xPositions = [arrangeLeft, arrangeRight];
 
         xPositions.forEach(function() {
 
           if (!xPositions[0]()) {
-            console.log("over left")
+            // console.log("over left")
             return xPositions[1]();
           }
 
           if (!xPositions[1]()) {
-             console.log("over right");
+            //  console.log("over right");
             return xPositions[0]();
           }
 
@@ -201,18 +241,33 @@ function Portal (options) {
 
         yPositions.forEach(function() {
           if (!yPositions[0]()) {
+             console.log("over top");
             return yPositions[1]();
           }
 
           if (!yPositions[1]()) {
+            console.log("over bottom")
             return yPositions[0]();
           }
 
           if (options.position === "bottom") {
+
+
+            if (!xPositions[1]()) {
+              console.log("over right")
+              flipBottomRight();
+            }
             return yPositions[1]();
           }
 
           if (options.position === "top") {
+            if (!xPositions[1]()) {
+               console.log("over right");
+              return flipRight()
+            }
+            if (!xPositions[0]()) {
+              return flipLeft();
+            }
             return yPositions[0]();
           }
         });
@@ -226,6 +281,8 @@ function Portal (options) {
   function setPosition(coordinates, portalBox, triangle) {
     portalBox.style.top = 0
     portalBox.style.left = 0
+    // portalBox.style.left = coordinates.x + "px";
+    // portalBox.style.top = coordinates.y + "px";
     portalBox.style.transform = "translate(" + coordinates.x + "px" + "," + coordinates.y + "px" + ")"
 
 
@@ -309,36 +366,36 @@ let user = new User();
 // }
 
 
-const PortalRight = new Portal({
-  target: ".button-2",
-  position: "right",
-  triangle: true,
-  hover: false
-});
+// const PortalRight = new Portal({
+//   target: ".button-2",
+//   position: "right",
+//   triangle: true,
+//   hover: false
+// });
 
 // // // PortalRight.test('Alex')
 
-const PortalTop = new Portal({
-  target: '.button-5',
-  position: 'top',
-  triangle: true
-});
+// const PortalTop = new Portal({
+//   target: '.button-5',
+//   position: 'top',
+//   triangle: true
+// });
 
 // const PortalTopNew = new Portal({
 //   target: '.button-4',
 //   position: 'top',
-//   triangle: false
+//   triangle: true
 // });
 
 // const PortalBottom = new Portal({
 //   target: ".button-3",
-//   position: "bottom",
+//   position: "top",
 //   triangle: true
 // });
 
 const PortalLeft = new Portal({
   triangle: true,
-  position: 'left',
+  position: 'top',
   hover: false,
   target: "#custom-button"
 });
@@ -353,8 +410,8 @@ const PortalLeft = new Portal({
 
 function shuffleRandom(nodes) {
   let elements = document.querySelectorAll(nodes)
-  let max = 2000;
-  let min = 200;
+  let max = 2800;
+  let min = 1000;
   elements.forEach(element => {
     element.style = "margin-left:" + Math.random() * (max - min) + min + "px";
   });

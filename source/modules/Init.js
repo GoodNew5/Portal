@@ -17,36 +17,36 @@ let Init = function(targetButton) {
   };
 
   this.renderTarget = function() {
-    let target = document.querySelector(targetButton);
-    if (target === null) {
-      console.error(
-        'Target is not detected, check option "target" or your HTML'
-      );
-      return false;
-    }
+    try {
+      let target = document.querySelector(targetButton);
+      target.className = "button-open-portal";
+      return target;
 
-    target.className = "button-open-portal";
-    return target;
+    }
+    catch (error) {
+      console.error('Target is not detected, check option "target" or your HTML');
+    }
   };
 
-  this.renderTriangle = function (where) {
-    let triangle = document.createElement("div");
-    where.appendChild(triangle);
+  this.renderTriangle = function (portalBox) {
+    let triangle = document.createElement("div")
+    portalBox.appendChild(triangle);
     return triangle
   }
 
   this.renderPortalBox = function(target) {
-    let portal = document.querySelector(target.dataset.portal);
-
-    if (portal === null) {
-      console.error(
-        'Check in your html data atribute "data-portal", content not found'
-      );
-      return false;
+    try {
+      let portal = document.querySelector(target.dataset.portal);
+       portal.className = "portal-box";
+       portal.style = "position: absolute;";
+      return portal;
     }
-    portal.className = "portal-box";
-    portal.style = "position: absolute;"
-    return portal;
+    catch (error) {
+      console.error('Check in your html data atribute "data-portal", content not found');
+    }
+
+
+
   };
 };
 export { Init }
