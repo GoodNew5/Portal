@@ -103,10 +103,12 @@ body, html {
   margin: 50px;
   position: relative;
   border-left: 20px black solid;
-  /* border-right: 40px black solid; */
+  border-right: 40px black solid;
+  border-bottom: 30px teal solid;
   border-top: 30px gold solid;
   padding: 40px;
   /* width: 600px; */
+  height: 1050px;
   /* overflow: auto; */
 }
 .outer-portal {
@@ -124,11 +126,11 @@ body, html {
   /* display: flex; */
   flex-wrap: wrap;
   align-items: center;
-  height:950px;
+  height:1100px;
   /* display: flex; */
 }
 .portal-1 .button-open-portal {
-  margin-top: 300px;
+  margin-top: 490px;
 }
 .portal-1 .portal-box {
   /* height: 400px; */

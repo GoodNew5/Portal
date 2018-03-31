@@ -1,21 +1,5 @@
 let Init = function(targetButton) {
 
-
-  this.renderPreview = function() {
-    let targetPreview = document.createElement("div");
-    targetPreview.className = "button-open-portal";
-    targetPreview.innerHTML = "Portal";
-    targetPreview.setAttribute("data-portal", ".portal-preview");
-    let portalBoxPreview = document.createElement("div");
-    portalBoxPreview.className = "portal-box";
-    portalBoxPreview.innerHTML = "This is Portal preview"
-    portalBoxPreview.classList.add("portal-preview");
-    document.body.appendChild(portalBoxPreview);
-    document.body.appendChild(targetPreview);
-
-    return targetPreview;
-  };
-
   this.renderTarget = function() {
     try {
       let target = document.querySelector(targetButton);
@@ -44,8 +28,6 @@ let Init = function(targetButton) {
     catch (error) {
       console.error('Check in your html data atribute "data-portal", content not found');
     }
-
-
 
   };
 };
