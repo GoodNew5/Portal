@@ -1,15 +1,15 @@
 let Init = function(targetButton) {
 
   this.renderTarget = function() {
-    try {
-      let target = document.querySelector(targetButton);
-      target.className = "button-open-portal";
-      return target;
 
+    let target = document.querySelector(targetButton);
+    if (!target) {
+      return
     }
-    catch (error) {
-      console.error('Target is not detected, check option "target" or your HTML');
-    }
+    target.className = "button-open-portal";
+    return target;
+
+
   };
 
   this.renderTriangle = function (portalBox) {
@@ -19,15 +19,14 @@ let Init = function(targetButton) {
   }
 
   this.renderPortalBox = function(target) {
-    try {
-      let portal = document.querySelector(target.dataset.portal);
-       portal.className = "portal-box";
-       portal.style = "position: absolute;";
-      return portal;
+
+    let portal = document.querySelector(target.dataset.portal);
+    if (!portal) {
+      return
     }
-    catch (error) {
-      console.error('Check in your html data atribute "data-portal", content not found');
-    }
+    portal.className = "portal-box";
+    portal.style = "position: absolute;";
+    return portal;
 
   };
 };
