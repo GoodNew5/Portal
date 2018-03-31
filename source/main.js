@@ -316,19 +316,6 @@ function Portal (options) {
 
 
 
-function User() {
-  let a = 2;
-  this.name = "Alex"
-  console.log(this)
-}
-
-let user = new User();
-// console.log(user.name)
-// function remove(node) {
-//   var el = document.querySelector(node);
-//   document.body.removeChild(el);
-// }
-
 
 // const PortalRight = new Portal({
 //   target: ".button-2",
