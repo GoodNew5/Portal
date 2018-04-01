@@ -6,7 +6,7 @@ let Init = function(targetButton) {
     if (!target) {
       return
     }
-    target.className = "button-open-portal";
+    target.classList.add("button-open-portal")
     return target;
 
 

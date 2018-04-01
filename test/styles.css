@@ -101,7 +101,7 @@ body, html {
 .portal-1, .portal-2, .portal-3, .portal-4, .portal-5 {
   padding: .1px;
   margin: 50px;
-  position: relative;
+  /* position: relative; */
   border-left: 20px black solid;
   border-right: 40px black solid;
   border-bottom: 30px teal solid;
@@ -130,7 +130,7 @@ body, html {
   /* display: flex; */
 }
 .portal-1 .button-open-portal {
-  margin-top: 490px;
+  margin-top: 190px;
 }
 .portal-1 .portal-box {
   /* height: 400px; */
