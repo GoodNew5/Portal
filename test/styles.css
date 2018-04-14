@@ -28,7 +28,7 @@ body, html {
   font-size: 15px;
   text-align: center;
   cursor: pointer;
-  margin: 50px auto;
+  /* margin: 50px auto; */
   padding: 10px;
   display: flex;
   align-items: center;
@@ -82,7 +82,7 @@ body, html {
   /* justify-content: center; */
   /* border-radius: 5px; */
   /* border-top-left-radius: 0; */
-  /* transition: .3s opacity; */
+  /* transition: .3s; */
   visibility: hidden;
   opacity: 0;
 }
@@ -130,7 +130,7 @@ body, html {
   /* display: flex; */
 }
 .portal-1 .button-open-portal {
-  margin-top: 190px;
+  margin-top: 490px;
 }
 .portal-1 .portal-box {
   /* height: 400px; */
