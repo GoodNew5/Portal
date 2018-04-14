@@ -5,9 +5,10 @@ import Portal from '../src/Portal'
 
 const PortalTop = new Portal({
   target: '.button-5',
-  positions: ['top', 'bottom'],
+  positions: ['top', 'right', 'bottom'],
   triangle: true
 });
+
 
 const PortalTopNew = new Portal({
   target: '.button-4',
@@ -23,7 +24,7 @@ const PortalBottom = new Portal({
 
 const PortalLeft = new Portal({
   triangle: true,
-  positions: ['left', 'right'],
+  positions: ['top', 'right', 'bottom'],
   hover: false,
   target: "#custom-button"
 });
@@ -40,4 +41,15 @@ const PortalPreview = new Portal({
   triangle: true
 });
 
+
+function shuffleRandom(nodes) {
+  let elements = document.querySelectorAll(nodes)
+  let max = 2800;
+  let min = 1000;
+  elements.forEach(element => {
+    element.style = "margin-left:" + Math.random() * (max - min) + min + "px";
+  });
+}
+
+// shuffleRandom(".button-open-portal");
 
