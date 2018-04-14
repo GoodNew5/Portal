@@ -2,7 +2,6 @@
  *  @version 0.2
  *  @author Alexander Veselov
  *  @todo responsive
- *  @todo user scenary
  *
  */
 
@@ -11,7 +10,6 @@
 
 import { Triangle } from './modules/Triangle'
 import { Init } from './modules/Init'
-import { every } from 'rxjs/operator/every';
 import { setPosition } from './modules/setPosition'
 
 
@@ -21,7 +19,6 @@ export default function Portal (options) {
   /**
    * @param {node} target - Элемент-якорь относительно которого задана позиция
    */
-  console.log(this)
   options = {
     target: options.target,
     triangle: options.triangle || false,
@@ -39,6 +36,7 @@ export default function Portal (options) {
 
   const root = target.offsetParent
   const rootLeft = root.clientLeft;
+  const rootTop = root.clientTop;
   const portalBox = InitPortal.renderPortalBox(target);
 
   if (!portalBox) {
@@ -78,6 +76,8 @@ export default function Portal (options) {
     const scrollTop = window.pageYOffset
     const scrollLeft = window.pageXOffset
     const heightCase = sizes.target.height > sizes.box.height;
+    const getCoords = (el) => el.getBoundingClientRect()
+    const displayTriangle = options.triangle
 
     options.triangle ? coordinates.tr = {} : null
 
@@ -91,74 +91,39 @@ export default function Portal (options) {
       }
     }
 
-    function computedBordersWidth(border) {
-      const width = Number(border.match(/\d+/, ""))
-      return width
-    }
 
-    function getCoords(el) {
-      return el.getBoundingClientRect()
-    }
 
     function arrangeBottom() {
       coordinates.x = getCoords(target).left - (sizes.box.width - sizes.target.width) / 2 + scrollLeft
       coordinates.y =  getCoords(target).bottom + sizes.triangle.height + scrollTop
 
-      if (coordinates.y + sizes.box.height > sizes.root.height) {
-        return false;
-      }
-
-      if (options.triangle) {
+      if (displayTriangle) {
         coordinates.tr.y = -sizes.triangle.height;
         coordinates.tr.x = 0;
         triangle.style = Triangle("bottom", options.triangleSize);
       }
 
-      return true;
-    }
-
-    function arrangeRight() {
-      coordinates.x =  getCoords(target).right + sizes.triangle.width + scrollLeft
-      coordinates.y =  getCoords(target).top + scrollTop
-
-
-      if (options.triangle) {
-        coordinates.tr.x = -sizes.triangle.width;
-        coordinates.tr.y = alignedTriangleY(sizes.target);
-        alignedYCase1();
-        triangle.style = Triangle("left", options.triangleSize);
-      }
-
-      if (coordinates.x + sizes.box.width > sizes.root.width) {
+      if (coordinates.y + sizes.box.height > sizes.root.height) {
         return false;
-      }
-      return true;
-    }
-
-    function arrangeLeft() {
-      coordinates.x = getCoords(target).left - sizes.box.width - sizes.triangle.width + scrollLeft
-      coordinates.y = getCoords(target).top + scrollTop
-      // let overCondVertical = coordinates.x - sizes.triangle.width + sizes.box.width / 2 < rootLeft
-
-      if (options.triangle) {
-        coordinates.tr.x = sizes.box.width;
-        coordinates.tr.y = alignedTriangleY(sizes.target);
-        alignedYCase1();
-        triangle.style = Triangle("right", options.triangleSize);
       }
 
       if (coordinates.x < rootLeft) {
-        return false;
+        if (displayTriangle) {
+          coordinates.tr.x = sizes.target.width / 2 - sizes.triangle.width
+          triangle.style = Triangle("bottom", options.triangleSize, false)
+        }
+        coordinates.x =  getCoords(target).left + scrollLeft
+
       }
 
-      return true
+      return true;
     }
 
     function arrangeTop() {
       coordinates.y = getCoords(target).top - sizes.box.height - sizes.triangle.height + scrollTop;
       coordinates.x = getCoords(target).left - (sizes.box.width - sizes.target.width) / 2 + scrollLeft;
 
-      if (options.triangle) {
+      if (displayTriangle) {
         coordinates.tr.y = sizes.box.height
         coordinates.tr.x = 0;
         triangle.style = Triangle("top", options.triangleSize);
@@ -168,33 +133,53 @@ export default function Portal (options) {
         return false;
       }
 
+      if (coordinates.x < rootLeft ) {
+        if (displayTriangle) {
+          coordinates.tr.x = sizes.target.width / 2 - sizes.triangle.width
+          triangle.style = Triangle("top", options.triangleSize, false);
+        }
+        coordinates.x =  getCoords(target).left + scrollLeft
+      }
+
       return true
     }
 
-    // function flipRight () {
-    //   coordinates.y = targetTop - sizes.box.height - sizes.triangle.height
-    //   coordinates.x = targetLeft - sizes.box.width + sizes.target.width
 
-    //   if (options.triangle) {
-    //     coordinates.tr.y = sizes.box.height;
-    //     coordinates.tr.x = sizes.box.width - (sizes.target.width / 2) - sizes.triangle.width
-    //     triangle.style = Triangle("top", options.triangleSize, false)
-    //   }
-    //   return true
-    // }
+    function arrangeRight() {
+      coordinates.x =  getCoords(target).right + sizes.triangle.width + scrollLeft
+      coordinates.y =  getCoords(target).top + scrollTop
 
-    // function flipLeft() {
-    //   coordinates.y = targetTop - sizes.box.height - sizes.triangle.height
-    //   coordinates.x = targetLeft
+      if (displayTriangle) {
+        coordinates.tr.x = -sizes.triangle.width;
+        coordinates.tr.y = alignedTriangleY(sizes.target);
+        alignedYCase1();
+        triangle.style = Triangle("left", options.triangleSize);
+      }
 
-    //   if (options.triangle) {
-    //     coordinates.tr.y = sizes.box.height;
-    //     coordinates.tr.x = sizes.target.width / 2 - sizes.triangle.width
-    //     triangle.style = Triangle("top", options.triangleSize, false);
-    //   }
-    //   return true
-    // }
+      if (coordinates.x + sizes.box.width > sizes.root.width || scrollTop > coordinates.y) {
+        return false;
+      }
 
+      return true;
+    }
+
+    function arrangeLeft() {
+      coordinates.x = getCoords(target).left - sizes.box.width - sizes.triangle.width + scrollLeft
+      coordinates.y = getCoords(target).top + scrollTop
+
+      if (displayTriangle) {
+        coordinates.tr.x = sizes.box.width;
+        coordinates.tr.y = alignedTriangleY(sizes.target);
+        alignedYCase1();
+        triangle.style = Triangle("right", options.triangleSize);
+      }
+
+      if (coordinates.x < rootLeft || scrollTop > coordinates.y) {
+        return false;
+      }
+
+      return true
+    }
 
     function conductor() {
 
@@ -281,34 +266,3 @@ export default function Portal (options) {
     }
   }
 };
-
-
-
-
-// // // PortalRight.test('Alex')
-
-
-
-
-
-function shuffleRandom(nodes) {
-  let elements = document.querySelectorAll(nodes)
-  let max = 2800;
-  let min = 1000;
-  elements.forEach(element => {
-    element.style = "margin-left:" + Math.random() * (max - min) + min + "px";
-  });
-}
-
-// shuffleRandom(".button-open-portal");
-
-function getSize(node) {
-  let el = document.getElementById(node)
-  let sizes = {
-    width: el.offsetWidth,
-    height: el.offsetHeight,
-  }
-  console.log(sizes)
-}
-
-// getSize("custom-button");
