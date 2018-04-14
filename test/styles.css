@@ -28,7 +28,7 @@ body, html {
   font-size: 15px;
   text-align: center;
   cursor: pointer;
-  /* margin: 50px auto; */
+  margin: 50px auto;
   padding: 10px;
   display: flex;
   align-items: center;
