@@ -12,9 +12,6 @@ import { Triangle } from './modules/Triangle'
 import { Init } from './modules/Init'
 import { setPosition } from './modules/setPosition'
 
-
-
-
 export default function Portal (options) {
 
   /**
