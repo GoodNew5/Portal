@@ -22,9 +22,10 @@ const PortalBottom = new Portal({
   triangle: false
 });
 
+
 const PortalLeft = new Portal({
-  triangle: true,
-  positions: ['top', 'right', 'bottom'],
+  triangle: false,
+  positions: ['left', 'right', 'bottom'],
   hover: false,
   target: "#custom-button"
 });

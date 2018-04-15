@@ -14,6 +14,7 @@ import { setPosition } from './modules/setPosition'
 
 
 
+
 export default function Portal (options) {
 
   /**
@@ -44,9 +45,6 @@ export default function Portal (options) {
   }
 
   let triangle = options.triangle ? InitPortal.renderTriangle(portalBox) : null
-
-
-  const sizes = getSize(portalBox, target, root);
 
   function getSize(portalBox, target, root) {
     let sizes = {
@@ -94,8 +92,8 @@ export default function Portal (options) {
 
 
     function arrangeBottom() {
-      coordinates.x = getCoords(target).left - (sizes.box.width - sizes.target.width) / 2 + scrollLeft
-      coordinates.y =  getCoords(target).bottom + sizes.triangle.height + scrollTop
+      coordinates.x = Math.round(getCoords(target).left - (sizes.box.width - sizes.target.width) / 2 + scrollLeft)
+      coordinates.y = Math.round(getCoords(target).bottom + sizes.triangle.height + scrollTop)
 
       if (displayTriangle) {
         coordinates.tr.y = -sizes.triangle.height;
@@ -112,7 +110,7 @@ export default function Portal (options) {
           coordinates.tr.x = sizes.target.width / 2 - sizes.triangle.width
           triangle.style = Triangle("bottom", options.triangleSize, false)
         }
-        coordinates.x =  getCoords(target).left + scrollLeft
+        coordinates.x =  Math.round(getCoords(target).left + scrollLeft)
 
       }
 
@@ -120,8 +118,8 @@ export default function Portal (options) {
     }
 
     function arrangeTop() {
-      coordinates.y = getCoords(target).top - sizes.box.height - sizes.triangle.height + scrollTop;
-      coordinates.x = getCoords(target).left - (sizes.box.width - sizes.target.width) / 2 + scrollLeft;
+      coordinates.y = Math.round(getCoords(target).top - sizes.box.height - sizes.triangle.height + scrollTop)
+      coordinates.x = Math.round(getCoords(target).left - (sizes.box.width - sizes.target.width) / 2 + scrollLeft)
 
       if (displayTriangle) {
         coordinates.tr.y = sizes.box.height
@@ -146,8 +144,8 @@ export default function Portal (options) {
 
 
     function arrangeRight() {
-      coordinates.x =  getCoords(target).right + sizes.triangle.width + scrollLeft
-      coordinates.y =  getCoords(target).top + scrollTop
+      coordinates.x =  Math.round(getCoords(target).right + sizes.triangle.width + scrollLeft)
+      coordinates.y =  Math.round(getCoords(target).top + scrollTop)
 
       if (displayTriangle) {
         coordinates.tr.x = -sizes.triangle.width;
@@ -164,8 +162,8 @@ export default function Portal (options) {
     }
 
     function arrangeLeft() {
-      coordinates.x = getCoords(target).left - sizes.box.width - sizes.triangle.width + scrollLeft
-      coordinates.y = getCoords(target).top + scrollTop
+      coordinates.x = Math.round(getCoords(target).left - sizes.box.width - sizes.triangle.width + scrollLeft)
+      coordinates.y = Math.round(getCoords(target).top + scrollTop)
 
       if (displayTriangle) {
         coordinates.tr.x = sizes.box.width;
@@ -175,6 +173,7 @@ export default function Portal (options) {
       }
 
       if (coordinates.x < rootLeft || scrollTop > coordinates.y) {
+        console.log('lflf')
         return false;
       }
 
@@ -252,14 +251,12 @@ export default function Portal (options) {
   target.addEventListener(eventsForShow, displacement);
   window.addEventListener(eventsForHidden, hiddenPortal);
 
-  function draw(sizes) {
-    let coordinates = placement(target, sizes);
-    setPosition(coordinates, portalBox, triangle);
-  }
+
 
   function displacement(event) {
     let sizes = getSize(portalBox, target, root);
-    draw(sizes);
+    let coordinates = placement(target, sizes);
+    setPosition(coordinates, portalBox, triangle);
 
     if (!(event.type === "resize" || event.type === "DOMContentLoaded")) {
       showPortal()
